@@ -4,6 +4,7 @@ import seaborn as sns
 import numpy as np
 import os
 
+# * [ ] https://www.youtube.com/watch?v=BCRTcGoAXJQ
 
 def sl():
     w = 99
