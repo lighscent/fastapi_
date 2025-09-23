@@ -11,7 +11,7 @@ import subs.get_dataframe_from_gh_csv_files as gh
 
 def sl():
     w = 99
-    print("-" * w + ">")
+    print("-" * w + "→")
 
 
 if __name__ == "__main__":
