@@ -206,7 +206,7 @@ if __name__ == "__main__":
     sl()
     df_clean["Ville"] = df_clean["Purchase Address"].apply(get_ville)
     print(df_clean.sample(5))
-    print('Villes uniques :')
+    print("Villes uniques :")
     print(*enumerate(df_clean["Ville"].unique()), sep="\n")
 
     ca_by_city = (
@@ -220,15 +220,20 @@ if __name__ == "__main__":
     # plt.show()
 
     sl()
-    df_clean['Heure'] = df_clean.index.hour
+    df_clean["Heure"] = df_clean.index.hour
     ca_par_heure = pd.DataFrame(df_clean.groupby("Heure")["chiffre_daffaire"].sum())
     print(ca_par_heure)
 
     sns.lineplot(data=ca_par_heure["chiffre_daffaire"])
-    # plt.xticks(ticks=range(0, 24))
-    # plt.grid()
-    # plt.title("Chiffre d'affaire par heure")
-    # plt.show()
+    plt.xticks(ticks=range(0, 24))
+    plt.grid()
+    plt.title("Chiffre d'affaire par heure")
+    plt.show()
 
     sl()
-    print(df_clean.groupby("Product")["Quantity Ordered"].sum().sort_values(ascending=False).head(7))
+    print(
+        df_clean.groupby("Product")["Quantity Ordered"]
+        .sum()
+        .sort_values(ascending=False)
+        .head(7)
+    )
