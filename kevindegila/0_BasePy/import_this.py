@@ -1,3 +1,5 @@
+import this
+
 def sl():
     w = 99
     print("─" * w + "→")
@@ -6,4 +8,4 @@ def sl():
 if __name__ == "__main__":
     sl()
 
-    print("Ok")
+    print("See CLI...")
