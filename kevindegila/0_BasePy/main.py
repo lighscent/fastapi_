@@ -1,9 +1,9 @@
-def sl():
-    w = 99
-    print("─" * w + "→")
+from sl import sl
+import numpy as np
 
 
 if __name__ == "__main__":
     sl()
-
-    print("Ok")
+    a = np.array([1, 2, 3])
+    print("le soleil brille".title())
+    print(a)

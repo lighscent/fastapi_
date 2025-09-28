@@ -1,7 +1,0 @@
-fastApi
-flet
-matplotlib
-pandas
-seaborn
-uvicorn
-tensorflow
