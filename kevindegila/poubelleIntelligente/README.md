@@ -19,9 +19,11 @@
 
     uvicorn api:app --reload
     → http://127.0.0.1:8000
-    
-    streamlit run frontend.py --server.runOnSave=true --server.fileWatcherType=auto
     → http://127.0.0.1:8000/docs
+    
+    streamlit run frontend.py
+    streamlit run frontend.py --server.runOnSave=true --server.fileWatcherType=auto
+    → http://localhost:8501
 
 ## Créer Dockerfile
 
