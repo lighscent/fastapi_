@@ -17,7 +17,7 @@ if upload:
     )
     resultat = req.json()
     print(resultat)
-    rec = resultat["predictions"]
+    rec = resultat["prediction"]
     prob_recyclable = rec * 100
     prob_organic = (1 - rec) * 100
 

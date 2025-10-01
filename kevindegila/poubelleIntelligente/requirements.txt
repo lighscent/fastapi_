@@ -1,5 +1,8 @@
-fastapi
+fastapi # + performant que flask
+io
 uvicorn
 python-multipart
 tensorflow
 streamlit
+PILLOW
+opencv-python

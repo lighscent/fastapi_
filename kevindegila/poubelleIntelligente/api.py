@@ -45,4 +45,4 @@ async def predict(file: UploadFile):
     predictions = model.predict(img_processed)
     rec = predictions[0][0].tolist()
 
-    return {"predictions": rec}
+    return {"prediction": rec}
