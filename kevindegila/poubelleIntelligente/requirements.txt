@@ -1,8 +1,6 @@
 fastapi # + performant que flask
-io
 uvicorn
 python-multipart
 tensorflow
+io
 streamlit
-PILLOW
-opencv-python

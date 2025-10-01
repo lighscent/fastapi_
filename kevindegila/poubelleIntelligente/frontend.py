@@ -2,6 +2,9 @@ import streamlit as st
 from PIL import Image
 import requests
 
+# Vide les caches
+# st.cache_data.clear()
+# st.cache_resource.clear()
 
 st.title("Poubelle Intelligente")
 

@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile
+
 from tensorflow.keras.models import load_model
 import numpy as np
 import io
@@ -9,7 +10,7 @@ app = FastAPI()
 
 @app.get("/")
 def great():
-    return {"message": "bonjour"}
+    return {"message": "Bonjour"}
 
 
 def load():
@@ -24,7 +25,6 @@ def preprocess(img):
     img = np.expand_dims(img, axis=0)
     return img
 
-
 # Chargement du model
 model = load()
 
@@ -37,11 +37,10 @@ async def predict(file: UploadFile):
     # ouvrir l'image
     img = Image.open(io.BytesIO(image_data))
 
-    # preprocessing
+    # traitement de l'image
     img_processed = preprocess(img)
 
     # prediction
-
     predictions = model.predict(img_processed)
     rec = predictions[0][0].tolist()
 
