@@ -16,7 +16,8 @@ if upload:
     files = {"file": upload.getvalue()}
     
     req = requests.post(
-        "http://127.0.0.1:8000/predict", files=files
+        # "http://127.0.0.1:8000/predict", files=files
+        "https://fastapi-img-721899277959.europe-west1.run.app/predict", files=files
     )
     resultat = req.json()
     print(resultat)
