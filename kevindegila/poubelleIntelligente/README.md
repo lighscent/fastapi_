@@ -67,8 +67,7 @@
     ✅ Vérif :
     
     gcloud artifacts docker images list europe-west1-docker.pkg.dev/fastapi-473910/fastapi-repo
-    
-    
+
 ## Mapper un domaine
     
     1. 🔐 Valider la propriété du domaine

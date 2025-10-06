@@ -369,3 +369,6 @@ https://www.youtube.com/watch?time_continue=1&v=0-yncL0bqZs&embeds_referring_eur
 https://www.youtube.com/watch?v=7D_0JTeaKWg&t=10s&ab_channel=JordyBayoTech
 
 python -m venv .venv
+
+Désinastaller toute sles libs pip
+pip freeze | xargs pip uninstall -y

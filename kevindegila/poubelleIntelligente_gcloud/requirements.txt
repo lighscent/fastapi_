@@ -1,0 +1,7 @@
+fastapi # + performant que flask
+uvicorn
+python-multipart
+tensorflow
+streamlit
+google-cloud-storage
+dotenv
