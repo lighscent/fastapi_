@@ -14,15 +14,6 @@ load_dotenv()
 bucket_name = os.getenv("BUCKET_NAME")
 json_key = os.getenv("JSON_KEY")
 
-# print(
-#     "Démarrage de l'API",
-#     os.getenv("PROJECT_NAME"),
-#     "\n",
-#     "Et du bucket:",
-#     bucket_name
-# )
-# exit()
-
 app = FastAPI()
 
 
@@ -75,16 +66,16 @@ async def predict(file: UploadFile):
 
     # traitement de l'image
     img_processed = preprocess(img)
-    
+
     # prediction
     predictions = model.predict(img_processed)
     rec = predictions[0][0].tolist()
-    
+
     # upload les images
     current_time = datetime.datetime.now()
     time_string = current_time.strftime("%Y%m%d %H%M%S")
 
-    filename = f'{time_string}_proba_{str(rec)}.jpeg'
+    filename = f"{time_string}_proba_{str(rec)}.jpeg"
     save_to_gcs(image_data, filename)
-    
+
     return {"prediction": rec}
