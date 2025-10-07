@@ -299,6 +299,8 @@ def reformule_answer(user_question: str, sql_result: Union[float, int, str]) -> 
     ]
 
     return safe_chat_request(messages)
+
+
 def render_simple_markdown(text: str) -> str:
     """
     Applique un rendu simple du Markdown avec des couleurs ANSI.
@@ -307,16 +309,12 @@ def render_simple_markdown(text: str) -> str:
 
     # Gras (**texte**)
     text = re.sub(
-        r"\*\*(.*?)\*\*", 
-        f"{Fore.YELLOW}{Style.BRIGHT}\\1{Style.RESET_ALL}", 
-        text
+        r"\*\*(.*?)\*\*", f"{Fore.YELLOW}{Style.BRIGHT}\\1{Style.RESET_ALL}", text
     )
 
     # Italique (*texte*)
     text = re.sub(
-        r"(?<!\*)\*([^*]+?)\*(?!\*)", 
-        f"{Fore.CYAN}\\1{Style.RESET_ALL}", 
-        text
+        r"(?<!\*)\*([^*]+?)\*(?!\*)", f"{Fore.CYAN}\\1{Style.RESET_ALL}", text
     )
 
     # Lignes de séparation
@@ -330,12 +328,16 @@ def main() -> None:
     Fonction principale du programme.
     """
     # Initialisation
-    # init()  # Colorama
+    # init()  # ✅ Décommenter pour colorama
 
     # Configuration
     MESSAGE_INI = "J'ai payé 20 euros en cash pour le transport."
     DB_FILE = "depenses.db"
-    question = "Quel est le total de mes dépenses de transport ?"
+    
+    question = "Quel est le total de mes dépenses hors du transport ?"
+    question = "J'ai combien d'opérations de moins de 30 euros ?"
+    question = "Montre-moi toutes les dépenses de moins de 30 euros"
+    question = "Quel est le total de mes dépenses en transport ?"
 
     # Création de la base si nécessaire
     if not os.path.exists(DB_FILE):
@@ -382,30 +384,96 @@ def main() -> None:
         # Traitement de la question
         print(render_simple_markdown(f"Question posée: **{question}**"))
 
-        # Exécution de la requête SQL
-        sql_query = "SELECT SUM(montant) FROM depenses WHERE categorie='transport';"
 
+        # ✅ LOGIQUE AMÉLIORÉE POUR TOUTES LES QUESTIONS (Pas optimisée, car n'utilise pas l'I.A. !)
         try:
-            conn = sqlite3.connect(DB_FILE)
-            sql_result = pd.read_sql_query(sql_query, conn).iloc[0, 0]
-            conn.close()
-
-            print(render_simple_markdown(f"Résultat SQL pur : **{int(sql_result)}**"))
-
-            # Reformulation de la réponse
             if REAL_AI_USE:
-                answer = reformule_answer(question, sql_result)
+                sql_query = text_to_sql(question)
+                print(render_simple_markdown(f"*Requête SQL générée :* `{sql_query.strip()}`"))
             else:
-                answer = f"Vous avez dépensé {int(sql_result)} euros en transport."
+                # ✅ Logique complète pour différents types de questions
+                question_lower = question.lower()
+                import re
+                
+                # Extraire le montant s'il y en a un
+                montant_match = re.search(r'(\d+)', question)
+                montant_seuil = int(montant_match.group(1)) if montant_match else 30
 
-            print("Réponse reformulée :", render_simple_markdown(f"**{answer}**"))
+                if "combien" in question_lower and "opération" in question_lower:
+                    if "moins de" in question_lower or "<" in question_lower:
+                        sql_query = f"SELECT COUNT(*) FROM depenses WHERE montant < {montant_seuil};"
+                    else:
+                        sql_query = "SELECT COUNT(*) FROM depenses;"
+                
+                elif "montre" in question_lower or "liste" in question_lower or "affiche" in question_lower:
+                    if "moins de" in question_lower or "<" in question_lower:
+                        sql_query = f"SELECT * FROM depenses WHERE montant < {montant_seuil};"
+                    elif "plus de" in question_lower or ">" in question_lower:
+                        sql_query = f"SELECT * FROM depenses WHERE montant > {montant_seuil};"
+                    else:
+                        sql_query = "SELECT * FROM depenses;"
+                
+                elif "hors" in question_lower or "sauf" in question_lower:
+                    sql_query = "SELECT SUM(montant) FROM depenses WHERE categorie != 'transport';"
+                
+                elif "transport" in question_lower:
+                    sql_query = "SELECT SUM(montant) FROM depenses WHERE categorie = 'transport';"
+                
+                else:
+                    # Question générale sur les montants
+                    sql_query = "SELECT SUM(montant) FROM depenses;"
+
+            print(render_simple_markdown(f"*Requête SQL utilisée :* `{sql_query.strip()}`"))
+
+            # ✅ GESTION DIFFÉRENTE SELON LE TYPE DE REQUÊTE
+            conn = sqlite3.connect(DB_FILE)
+            
+            if sql_query.strip().upper().startswith("SELECT *"):
+                # Pour les requêtes SELECT *, afficher le tableau
+                df_result = pd.read_sql_query(sql_query, conn)
+                print(render_simple_markdown("**Résultats trouvés :**"))
+                print(df_result.to_markdown(index=False))
+                sql_result = len(df_result)  # Nombre de lignes
+                conn.close()
+                
+                # Reformulation pour les listes
+                answer = f"Voici les {sql_result} dépenses trouvées (affichées ci-dessus)."
+            else:
+                # Pour les autres requêtes, récupérer la valeur
+                sql_result = pd.read_sql_query(sql_query, conn).iloc[0, 0]
+                conn.close()
+                print(render_simple_markdown(f"Résultat SQL pur : **{sql_result or 0}**"))
+
+                # ✅ REFORMULATION AMÉLIORÉE
+                if REAL_AI_USE:
+                    answer = reformule_answer(question, sql_result)
+                else:
+                    question_lower = question.lower()
+
+                    if "combien" in question_lower and "opération" in question_lower:
+                        if "moins de" in question_lower:
+                            answer = f"Vous avez {int(sql_result or 0)} opérations de moins de {montant_seuil} euros."
+                        else:
+                            answer = f"Vous avez {int(sql_result or 0)} opérations au total."
+                    
+                    elif "hors" in question_lower:
+                        answer = f"Vous avez dépensé {sql_result or 0} euros hors transport."
+                    
+                    elif "transport" in question_lower:
+                        answer = f"Vous avez dépensé {sql_result or 0} euros en transport."
+                    
+                    else:
+                        answer = f"Le total est de {sql_result or 0} euros."
+
+            print("Réponse reformulée :")
+            print(render_simple_markdown(f"**{answer}**"))
 
         except Exception as e:
-            logger.error(f"Erreur SQL: {e}")
+            logger.error(f"Erreur SQL ou génération: {e}")
     else:
         logger.error("Aucune donnée à traiter")
 
 
 if __name__ == "__main__":
     main()
-    print ('Mode', 'REAL' if REAL_AI_USE else 'SIMU', 'terminé.')
+    print("Mode", "REAL" if REAL_AI_USE else "SIMU", "terminé.")
