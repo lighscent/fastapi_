@@ -10,7 +10,7 @@ app = FastAPI()
 # Ref.: https://www.youtube.com/watch?v=NhzqPSvT4A8
 
 @app.get("/")
-def great():
+def great() -> dict:
     return {"message": "Bonjour 777"}
 
 
@@ -31,7 +31,7 @@ model = load()
 
 
 @app.post("/predict")
-async def predict(file: UploadFile):
+async def predict(file: UploadFile) -> dict:
     # lire le fichier image
     image_data = await file.read()
 
