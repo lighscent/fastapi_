@@ -7,10 +7,11 @@ from PIL import Image
 
 app = FastAPI()
 
+# Ref.: https://www.youtube.com/watch?v=NhzqPSvT4A8
 
 @app.get("/")
 def great():
-    return {"message": "Bonjour"}
+    return {"message": "Bonjour 777"}
 
 
 def load():

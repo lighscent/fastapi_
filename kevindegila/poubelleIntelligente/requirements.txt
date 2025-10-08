@@ -3,3 +3,8 @@ uvicorn
 python-multipart
 tensorflow
 streamlit
+# fastapi==0.115.0
+# uvicorn[standard]==0.32.0
+# python-multipart==0.0.20
+# # TensorFlow est déjà dans l'image de base
+# streamlit==1.40.0

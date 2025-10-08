@@ -2,10 +2,10 @@
 
 ## Install venv
 
-    python -m venv .venv
-    
     cd dossier
     
+    python -m venv .venv
+        
     .\.venv\Scripts\activate
     
     pip install -r requirements.txt
@@ -21,14 +21,22 @@
     → http://127.0.0.1:8000
     → http://127.0.0.1:8000/docs
     
+    # Avec host et port personnalisés
+    → uvicorn api:app --reload --host 0.0.0.0 --port 8080
+    
     streamlit run frontend.py
     streamlit run frontend.py --server.runOnSave=true --server.fileWatcherType=auto
     → http://localhost:8501
 
 ## Créer Dockerfile
 
+    * Supprimer l'ancienne image
+    docker rmi fastapi_img:v0
+    
+    * Rebuild avec la nouvelle version
     docker build -t fastapi_img:v0 .
     
+    * Test
     docker run -p 8000:8000 fastapi_img:v0
     
     (port_local:port_docker)
