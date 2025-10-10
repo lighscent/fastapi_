@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, HTTPException
+from fastapi import FastAPI, Path, HTTPException, Form
 import flet as ft
 from typing import Union, List, Optional
 from pydantic import BaseModel
@@ -54,6 +54,19 @@ async def read_component(number: int, text: Optional[str]) -> dict:
 @app.post("/position", response_model=CoordOut, response_model_exclude={"desc"})
 async def create_position(coord: CoordIn) -> dict:
     return coord
+
+
+@app.post("/position/form", response_model=CoordOut, response_model_exclude={"desc"})
+async def create_position_form(
+    pw: str = Form(...),
+    lat: float = Form(...),
+    lon: float = Form(...),
+    zoom: Optional[int] = Form(None),
+    desc: Optional[str] = Form(None),
+) -> dict:
+    if pw != "secret":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return {"lat": lat, "lon": lon, "zoom": zoom, "desc": desc} 
 
 
 if __name__ == "__main__":
