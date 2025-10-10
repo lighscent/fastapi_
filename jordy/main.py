@@ -3,9 +3,7 @@ import flet as ft
 from typing import Union, List, Optional
 from pydantic import BaseModel
 
-# import uvicorn
-
-# uvicorn main:app --reload
+import uvicorn
 
 app = FastAPI()
 
@@ -29,12 +27,17 @@ class CoordOut(BaseModel):
 
 @app.get("/hi")
 async def hello() -> dict:
-    return {"msg": "Salut !"}
+    """Say hello
+
+    Returns:
+        dict: A greeting message
+    """
+    return {"msg": "Hi !"}
 
 
 @app.get("/")
 async def hello() -> dict:
-    return {"msg": "Salut !"}
+    return {"msg": "Salut from main-app 123 !"}
 
 
 @app.get("/component/{component_id}")
@@ -42,11 +45,18 @@ async def get_component(component_id: int) -> dict:
     return {"component_id": component_id}
 
 
-@app.post("/position", response_model=CoordOut, response_model_exclude={"lat", 'desc'})
+# http://127.0.0.1:8000/component/?number=456&text=abc%20def
+@app.get("/component/")
+async def read_component(number: int, text: Optional[str]) -> dict:
+    return {"number": number, "text": text}
+
+
+@app.post("/position", response_model=CoordOut, response_model_exclude={"desc"})
 async def create_position(coord: CoordIn) -> dict:
     return coord
 
 
 if __name__ == "__main__":
     # uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
     print("Ready.")

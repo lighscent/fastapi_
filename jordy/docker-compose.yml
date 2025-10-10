@@ -1,0 +1,40 @@
+services:
+  main-app:
+    build:
+      context: .
+      target: main-app
+    ports:
+      - "8000:8000"
+    container_name: main-container
+
+  todo-app:
+    build:
+      context: .
+      target: todo-app
+    ports:
+      - "8080:8080"
+    container_name: todo-container
+
+# Nettoyer les anciennes images
+# docker system prune -f
+
+# Lancer les 2 services
+# docker-compose up -d
+
+# Arrêter
+# docker-compose down
+
+# Rebuild et relancer
+# docker-compose up --build -d
+
+# Vérifier que ça tourne
+# docker-compose ps
+
+# Voir l'état de Docker
+# docker info
+
+# Voir les containers
+# docker ps -a
+
+# Voir les logs si erreur
+# docker-compose logs
