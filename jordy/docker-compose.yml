@@ -1,11 +1,11 @@
 services:
-  main-app:
+  api-app:
     build:
       context: .
-      target: main-app
+      target: api-app
     ports:
       - "8000:8000"
-    container_name: main-container
+    container_name: api-container
 
   todo-app:
     build:

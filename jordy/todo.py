@@ -1,4 +1,3 @@
-from turtle import st
 from fastapi import FastAPI, Path, HTTPException
 from fastapi.responses import FileResponse
 import flet as ft

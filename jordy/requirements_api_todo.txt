@@ -6,7 +6,7 @@ uvicorn
 pydantic
 python-multipart
 
-tortoise-orm
+# tortoise-orm
 
 # tensorflow
 # streamlit

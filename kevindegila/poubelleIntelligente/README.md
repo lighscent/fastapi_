@@ -37,7 +37,11 @@
     docker build -t fastapi_img:v0 .
     
     * Test
+    
+    api-app :
     docker run -p 8000:8000 fastapi_img:v0
+    todo-app :
+    docker run -p 8000:8080 fastapi_img:v0
     
     (port_local:port_docker)
 
