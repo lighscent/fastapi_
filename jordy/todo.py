@@ -92,7 +92,7 @@ async def delete_todo(id: int = Path(..., description="The ID of the todo to del
         return {"deleted todo": obj}
     except IndexError:
         raise HTTPException(status_code=404, detail=f"ToDo #{id} not found")
-    
+
 if __name__ == "__main__":
     uvicorn.run("todo:app", host="127.0.0.1", port=8080, reload=True)
     print("Ready.")
