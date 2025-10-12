@@ -5,6 +5,7 @@ flet-desktop
 uvicorn
 pydantic
 python-multipart
+jinja2
 
 tortoise-orm
 
