@@ -1,0 +1,9 @@
+Using DirectML device: privateuseone:0
+Found 22564 train images, 2513 test images. Classes: ['O', 'R']
+AMP enabled: using GradScaler
+Epoch 1/2 - 360.8s - train_loss: 0.4264 acc: 0.8159 | val_loss: 0.2927 acc: 0.8906
+Saved best model (0.8906) to best_model_poubelle.pt
+Epoch 2/2 - 335.0s - train_loss: 0.3519 acc: 0.8585 | val_loss: 0.2723 acc: 0.9101
+Saved best model (0.9101) to best_model_poubelle.pt
+
+Final evaluation - loss: 0.2723 acc: 0.9101
