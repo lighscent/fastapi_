@@ -23,7 +23,7 @@ if not os.path.exists(train_dir) or not os.path.exists(test_dir):
     print("or update the 'data_dir' variable with the correct path.")
     exit()  # Exit the script if directories are not found
 
-# ImageDataGenerator for data loading and preprocessing
+# ImageDataGenerator for data loading and preprocessing  
 train_data_generator = ImageDataGenerator(rescale=1.0 / 255)
 test_data_generator = ImageDataGenerator(rescale=1.0 / 255)
 
