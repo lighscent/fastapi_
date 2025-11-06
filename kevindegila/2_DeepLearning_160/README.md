@@ -1,10 +1,14 @@
 # Deep Learning : De Zéro à la Certification Tensorflow
 
+
+
 Apprendre l’Intelligence Artificielle avec Tensorflow et passer l’examen Tensorflow developer Certification de Google.
 
 Suivre la formation sur [Udemy](https://www.udemy.com/course/deep-learning-de-zero-a-la-certification-tensorflow/?referralCode=736CA5E82E8C3418B458)
 
 # Curriculum de la formation
+
+## [Nombreux notebooks & Sources de datasets Kolasniwash](https://github.com/kolasniwash/tensorflow-certification-study-guide?tab=readme-ov-file)
 
 ## Les Fondamentaux du Deep Learning
 

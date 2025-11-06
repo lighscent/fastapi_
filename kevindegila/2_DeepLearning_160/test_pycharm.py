@@ -39,13 +39,13 @@ model_ckp = tf.keras.callbacks.ModelCheckpoint(filepath="best_model.h5",
                             monitor="val_accuracy",
                             mode="max",
                             save_best_only=True)
-stop = tf.keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=2)
+stop = tf.keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=12)
 
 
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=['accuracy'])
 
 
-h= model.fit(training_images, training_labels, epochs=50,
+h= model.fit(training_images, training_labels, epochs=999,
              validation_data=(test_images, test_labels),
              callbacks = [model_ckp, stop])
 
