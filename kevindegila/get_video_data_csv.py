@@ -1,0 +1,149 @@
+from sqlalchemy import null
+from datetime import datetime
+import os, random, time
+import numpy as np
+import pandas as pd
+from tabulate import tabulate
+import flet as ft
+
+AUTHOR = "KevinDegila"
+# AUTHOR = "c57-u5s"
+# AUTHOR = "doro2255"
+# AUTHOR = "LionelCOTE"
+
+TEST = 0
+
+SUFFIX = f"_test{TEST}" if TEST else ""
+
+CACHE_DIR = "D:/fastapi/kevindegila/cache"
+CACHED_CSV_PATH = os.path.join(CACHE_DIR, f"{AUTHOR}_videos{SUFFIX}.csv")
+
+
+def analyze_dataset(df):
+    """Affiche quelques statistiques sur le dataset"""
+    print("\n=== Statistiques du dataset ===")
+    print(f"Nombre total de vidéos : {len(df)}")
+    print(f"\nPériode couverte :")
+    print(f"- Première vidéo : {df['upload_date'].min()}")
+    print(f"- Dernière vidéo : {df['upload_date'].max()}")
+
+    print(f"\nDurée moyenne des vidéos : {df['duration'].mean():.2f} secondes")
+
+    if "view_count" in df.columns:
+        print(f"\nVues :")
+        print(f"- Total : {df['view_count'].sum():,}")
+        print(f"- Moyenne : {df['view_count'].mean():,.0f}")
+        print(f"- Médiane : {df['view_count'].median():,.0f}")
+
+    # Vidéos par année
+    videos_by_year = df.groupby(df["upload_date"].dt.year).size()
+    print("\nVidéos par année :")
+    print(videos_by_year)
+
+
+def format_date(date):
+    """Formate une date ou retourne 'N/A' si None"""
+    if pd.isna(date) or date is None:
+        return "N/A"
+    try:
+        return date.strftime("%Y-%m-%d")
+    except:
+        return "N/A"
+
+
+def format_title(title, max_length=59):
+    """Tronque le titre à max_length caractères et ajoute ... si nécessaire"""
+    title = str(title or "N/A")
+    if len(title) > max_length:
+        return title[:max_length] + "..."
+    return title
+
+
+def format_duration(seconds):
+    """Convertit une durée en format HH:MM:SS"""
+    if pd.isna(seconds):
+        return "N/A"
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    remaining_seconds = int(seconds % 60)
+    return f"{hours:02d}:{minutes:02d}:{remaining_seconds:02d}"
+
+
+def display_videos_table(df):
+    """Affiche un tableau formaté des vidéos"""
+    # Nettoyer les dates
+    df["upload_date"] = pd.to_datetime(df["upload_date"], errors="coerce")
+
+    # Préparer les données pour le tableau
+    table_data = []
+    for _, row in df.iterrows():
+        table_data.append(
+            [
+                format_date(row["upload_date"]),
+                format_title(row.get("title", "N/A")),
+                format_duration(row.get("duration")),
+                row.get("view_count"),
+                row.get("like_count"),
+                row.get("comment_count") if pd.notna(row.get("comment_count")) else 0,
+                # len(row.get("comment_count")) if pd.notna(row.get("comment_count")) else 0,
+            ]
+        )
+
+    # Ajoute la ligne des totaux
+    views = df["view_count"].sum()
+    likes = df["like_count"].sum()
+    ratio = likes / views * 100
+    table_data.append(
+        ["Date", "Titre", "Durée", "Views", "Likes ( % views)", "Commentaires"]
+    )
+    table_data.append(
+        [
+            str(len(df)),  # Nombre total sous la dernière date
+            "vidéos pour une durée totale de ",  # Titre pour la ligne des totaux
+            format_duration(
+                df["duration"].sum()
+            ),  # Durée totale sous la dernière durée
+            views,
+            f"{likes} ({ratio:.1f}" + " %)",
+            df["comment_count"].sum(),
+        ]
+    )
+
+    # En-têtes du tableau
+    headers = ["Date", "Titre", "Durée", "Views", "Likes ( % views)", "Commentaires"]
+
+    # Afficher le tableau
+    print("\n=== Liste des vidéos de Kevin Degila ===")
+    print(tabulate(table_data, headers=headers, tablefmt="grid"))
+
+
+# Charger ou créer le dataset
+def get_videos_dataset():
+
+    # Si le fichier CSV n'existe pas, on fait une récupération complète
+    if not os.path.exists(CACHED_CSV_PATH) or os.path.getsize(CACHED_CSV_PATH) == 0:
+        return
+
+    # Si le fichier CSV existe, on charge et on met à jour
+    print("Chargement du dataset local...")
+    df = pd.read_csv(CACHED_CSV_PATH)
+    df["upload_date"] = pd.to_datetime(df["upload_date"])
+
+    # Récupération des nouvelles vidéos
+    last_date = df["upload_date"].max().strftime("%Y%m%d")
+    print(f"Recherche des nouvelles vidéos depuis le {last_date}...")
+
+    return df
+
+
+if __name__ == "__main__":
+    # Récupérer et trier le dataset
+    df = get_videos_dataset()
+    if df is None:
+        print(f"Aucun dataset local trouvé: {CACHED_CSV_PATH}.")
+        exit(1)
+    df = df.sort_values("upload_date", ascending=False)
+
+    # Afficher le tableau
+    # display_videos_table(df[1:2])
+    display_videos_table(df)
