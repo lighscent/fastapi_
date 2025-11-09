@@ -77,13 +77,16 @@ def display_videos_table(df):
     # Préparer les données pour le tableau
     table_data = []
     for _, row in df.iterrows():
+        views = row.get("view_count")
+        likes = row.get("like_count")
+        ratio = likes / views * 100
         table_data.append(
             [
                 format_date(row["upload_date"]),
                 format_title(row.get("title", "N/A")),
                 format_duration(row.get("duration")),
-                row.get("view_count"),
-                row.get("like_count"),
+                views,
+                f"{likes} ({ratio:.1f}" + " %)",
                 row.get("comment_count") if pd.notna(row.get("comment_count")) else 0,
                 # len(row.get("comment_count")) if pd.notna(row.get("comment_count")) else 0,
             ]
