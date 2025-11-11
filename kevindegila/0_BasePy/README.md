@@ -28,8 +28,8 @@ ex. "yann lecun" site:twitter.com -boredyannlecun "deep learning"
 
 * [ ] [Deep Learning](https://github.com/ageron/handson-ml2)
 
-* [/] [Vidéos de Kevin D](https://www.youtube.com/@KevinDegila/videos)
-  → Partir de la fin: [La der à finir](https://www.youtube.com/watch?v=BCRTcGoAXJQ)
+* [x] [Vidéos de Kevin D](https://www.youtube.com/@KevinDegila/videos)
+  → Toutes vues
 
 * [ ] [Principe de ML simplement - 3 vidéos](https://www.notion.so/27f2329f2b678016be36c0eaa0402efb)
 

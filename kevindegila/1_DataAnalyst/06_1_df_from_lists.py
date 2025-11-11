@@ -5,10 +5,16 @@ from tabulate import tabulate
 import urllib.request
 
 from matplotlib import pyplot as plt
+import os
+
+
+def cls():
+    os.system("cls" if os.name == "nt" else "clear")
+
 
 if __name__ == "__main__":
 
-    w = 178
+    w = 150
 
     noms = ["paul", "radji", "bob", "alice"]
     ages = [41, 53, 56, 38]
@@ -18,7 +24,8 @@ if __name__ == "__main__":
     df = pd.DataFrame(data)
 
     # print("\n" * 99, "\b" + "─" * 70 + ">")
-    print("\n" * 99)
+    # print("\n" * 9)
+    cls()
 
     print(noms, ages, poids, sep="\n")
     print("-" * w)

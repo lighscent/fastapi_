@@ -4,7 +4,6 @@ from tabulate import tabulate
 
 n = np.arange(1, 10)
 print(np.vstack([n, n**2, n**3]))
-print("-" * 55)
 
 notes = np.random.randint(21, size=(3, 5))
 
@@ -47,6 +46,9 @@ x = np.array(
 )
 
 moyennes = np.mean(x, axis=1)
+
+print("Moyennes des élèves :", moyennes)
+
 for i, m in enumerate(moyennes, 1):
     print(f"Élève {i} : {m:.2f}")
 print("-" * 89)

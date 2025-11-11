@@ -9,7 +9,7 @@ from subs.get_json import get_movies
 if __name__ == "__main__":
     movie = get_movies()
 
-print(movie.info())
+print("Movie info", movie.info())
 print(movie.head(3))
 print(movie.tail(3))
 print(movie)

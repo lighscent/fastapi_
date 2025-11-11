@@ -17,5 +17,6 @@ if __name__ == "__main__":
 
     df = tables[0]
     print("-" * w)
-    print(df.head(3))
-    
+
+    # print(df.head(3))
+    print(df)
