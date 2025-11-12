@@ -10,17 +10,20 @@ if __name__ == "__main__":
     titanic = sns.load_dataset("titanic")
     print(titanic.shape)
     # sns.histplot(titanic.age, kde=True)
-    # # sns.kdeplot(titanic.age)
-    # # sns.displot(titanic.age)
-    # # sns.histplot(titanic.age, kde=True, bins=5)
-    # # sns.histplot(
-    # #     titanic.age, kde=True, bins=5, stat="density", element="step", fill=False
-    # # )
-    # # plt.show()
+    # sns.kdeplot(titanic.age) # Pour avoir que la densité
+
+    # sns.displot(titanic.age, kde=True, color='b')
+    # sns.histplot(titanic.age, kde=True, bins=5, color='r')
+
+    # sns.histplot(
+    #     titanic.age, kde=True, bins=5, stat="density", element="step", fill=False
+    # )
+    # plt.show()
 
     # grid = sns.FacetGrid(titanic, row="sex", col="survived")
     # grid.map(plt.hist, "age")
-    # # plt.show()
+    # plt.show()
+    # exit()
 
     print(titanic.head())
 
@@ -28,13 +31,15 @@ if __name__ == "__main__":
     # sns.regplot(data=titanic, x="age", y="fare", scatter_kws={"alpha": 0.5})
     # plt.title("sns.regplot()")
     # plt.show()
+    # exit()
 
-    # Distribution of ages for those who survived vs those who did not
-    # sns.stripplot(data=titanic, x="survived", y="age")
-    # Distribution plus large
+    # Large Distribution of ages for those who survived vs those who did not
     sns.swarmplot(data=titanic, x="survived", y="age")
-    
-    # sns.pairplot(data=titanic, hue="survived")
+    # Distribution plus fine
+    sns.stripplot(data=titanic, x="survived", y="age")
+
+    sns.pairplot(data=titanic, hue="survived")
+    # plt.tight_layout()
     plt.show()
 
     # Doc Seaborn: https://seaborn.pydata.org/tutorial.html

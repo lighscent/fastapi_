@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     # OU:
 
-    data = [("2016", 3), ("2017", 8), ("2018", 5), ("2019", 12)]
+    data = [("2016", 3), ("2017", 8), ("2018", 5), ("2019", 13)]
     sns.set_style("whitegrid")
 
     df = pd.DataFrame(data, columns=["Années", "Valeurs"])
@@ -22,8 +22,17 @@ if __name__ == "__main__":
     y = df["Valeurs"]
 
     # Version directe avec pandas
-    # df.plot(x='Années', y='Valeurs', kind='line', marker='o', color='blue', figsize=(8, 5), title="Évolution des valeurs")
-    # plt.tight_layout()
+    # df.plot(
+    #     x="Années",
+    #     y="Valeurs",
+    #     kind="line",
+    #     marker="o",
+    #     color="blue",
+    #     figsize=(8, 5),
+    #     title="Évolution des valeurs",
+    # )
+    # plt.ylabel("Valeurs")
+    # plt.tight_layout() # Rempli le layout
     # plt.show()
 
     # Simple grap (MatLab)
@@ -32,6 +41,7 @@ if __name__ == "__main__":
     # plt.title("Notre simple graph")
     # plt.xlabel("Axe des x")
     # plt.ylabel("Axe des y")
+    # plt.tight_layout()
     # plt.plot(x, y)
     # plt.show()
 
@@ -65,8 +75,8 @@ if __name__ == "__main__":
     #     x,
     #     y,
     #     color="red",
-    #     s=500,
-    #     marker="*",
+    #     s=50,
+    #     marker="o",
     #     alpha=0.5,
     #     edgecolors="black",
     #     linewidths=2,
@@ -87,12 +97,13 @@ if __name__ == "__main__":
     # plt.bar(x, y)
     # plt.show()
 
+
     # Version recommandée
     # creer une figure
-    fig = plt.figure(figsize=(16, 8))  
+    fig = plt.figure(figsize=(16, 8))
     # definir le nombre de subplot et creer les axes
-    ax1 = fig.add_subplot(211) # 2 nrow, 1 ncols, graph #1
-    ax2 = fig.add_subplot(212) # 2 nrow, 1 ncols, graph #2
+    ax1 = fig.add_subplot(211)  # 2 nrow, 1 ncols, graph #1
+    ax2 = fig.add_subplot(212)  # 2 nrow, 1 ncols, graph #2
 
     # modifier chaque ax pour faire l'affichage
     ax1.set_xlabel("x")
@@ -104,6 +115,6 @@ if __name__ == "__main__":
     x = ["Hommes", "Femmes"]
     y = [180, 160]
     ax2.bar(x, y)
-    
+
     plt.tight_layout()
     plt.show()
