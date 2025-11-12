@@ -38,7 +38,8 @@ if __name__ == "__main__":
     # Distribution plus fine
     sns.stripplot(data=titanic, x="survived", y="age")
 
-    sns.pairplot(data=titanic, hue="survived")
+    # sns.pairplot(data=titanic, hue="survived")
+
     # plt.tight_layout()
     plt.show()
 
