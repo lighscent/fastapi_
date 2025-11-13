@@ -150,3 +150,59 @@ if __name__ == "__main__":
     # Afficher le tableau
     # display_videos_table(df[1:2])
     display_videos_table(df)
+
+    print(df)
+
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    # 1. Conversion de la date en datetime
+    df["upload_date"] = pd.to_datetime(df["upload_date"])
+
+    # 2. Conversion de la durée en minutes
+    df["duration_minutes"] = df["duration"] / 60
+
+    # 3. Tracer la courbe
+    # plt.figure(figsize=(8, 15))
+    # plt.plot(df["upload_date"], df["duration"], marker="o")
+    # plt.xlabel("Date de publication")
+    # plt.ylabel("Durée (minutes)")
+    # plt.title("Durée des vidéos publiées au fil du temps")
+    # plt.grid(True)
+    # plt.show()
+
+    # Regroupe par semaine et sommer les minutes
+    weekly_prod = df.resample("W", on="upload_date")["duration"].sum()
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(weekly_prod.index, weekly_prod.values, marker="o")
+
+    # Légendes plus explicites
+    plt.xlabel("Date (par semaine)")  # Axe des x
+    plt.ylabel("Durée totale des vidéos (minutes, échelle log)")  # Axe des y
+    plt.title("Évolution hebdomadaire de la production vidéo")  # Titre
+
+    plt.grid(True)
+    plt.yscale("log")
+    # https://prnt.sc/SgpuvAnZsxpf
+    plt.show()
+
+    # import seaborn as sns
+    # sns.boxplot(x=weekly_prod.values)
+    # plt.show()
+
+    # plt.ylim(0, 7000)  # par exemple, limite à 7000 minutes
+    # https://prnt.sc/KdXFvTV_45sh
+
+    plt.plot(
+        weekly_prod.index,
+        weekly_prod.values,
+        marker="o",
+        label="Production hebdomadaire",
+    )
+    plt.plot(
+        weekly_prod.index, weekly_prod.cumsum(), marker="x", label="Production cumulée"
+    )
+    plt.legend()
+    plt.show()
+    # https://prnt.sc/3ZWd-G1t-vTD

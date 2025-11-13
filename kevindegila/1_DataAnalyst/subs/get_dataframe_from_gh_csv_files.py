@@ -71,16 +71,18 @@ def getGhCsvFilesAndSaveThem():
         # df_total = pd.concat(frames, ignore_index=True)
         df_total = pd.concat(frames)
         # print(f"Fichiers chargés : {paths}")
-        print('df.shape:', df_total.shape)
+        print("df.shape:", df_total.shape)
     else:
         print("Aucun fichier CSV n'a pu être chargé.")
 
     return df_total if frames else None
 
+
 if __name__ == "__main__":
     # print(*enumerate(getGhCsvFilesAndSaveThem()), sep="\n")
     df = getGhCsvFilesAndSaveThem()
-    # print("\nlen url: " + str(len(urls)), *enumerate(urls), sep='\n')
     
+    # print("\nlen url: " + str(len(urls)), *enumerate(urls), sep='\n')
+
     # print (df.head())
     # pass

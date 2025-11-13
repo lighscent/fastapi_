@@ -4,32 +4,44 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-import datetime, os
+import datetime, os, sys
 
 import subs.get_dataframe_from_gh_csv_files as gh
 
 
 def sl():
     w = 99
-    print("-" * w + "→")
+    print("─" * w + "→")
+
+
+def cls():
+    # os.system("cls" if os.name == "nt" else "clear")
+    # Envoie directement les codes ANSI pour effacer l'écran (+ robuste)
+    sys.stdout.write("\033[H\033[J")
+    sys.stdout.flush()
 
 
 if __name__ == "__main__":
-    import pandas as pd
+
+    cls()
 
     df = gh.getGhCsvFilesAndSaveThem()
-    # print(df)
-    sl()
-    # exit()
+    print(df)
 
+    sl()
+    print(df.describe())
+
+    sl()
     print("5 samples :")
     df_sample5 = df.sample(5)
 
+    sl()
     pd.set_option("display.max_columns", None)  # Affiche toutes les colonnes
     pd.set_option("display.expand_frame_repr", False)  # Empêche le retour à la ligne
     print(df_sample5)
 
-    pd.set_option("display.max_columns", 7)  # Affiche 7 les colonnes
+    sl()
+    pd.set_option("display.max_columns", 4)  # Affiche 4 les colonnes
     # pd.set_option('display.expand_frame_repr', True)  # Re-autorise le retour à la ligne
     print(df_sample5)
 
@@ -37,22 +49,19 @@ if __name__ == "__main__":
     print(df.info())
 
     sl()
-    print("Nettoyage des comonnes")
-
+    nb = df.columns.size
+    print(f"Nettoyage des {nb} colonnes")
     df.columns = df.columns.str.strip()
+
     from collections import Counter
 
     print(Counter(df.columns))
 
+    sl()
     df = df.loc[:, ~df.columns.duplicated()]
-    from collections import Counter
-
-    print(Counter(df.columns))
-
-    sl()
     print(df.isnull().sum(axis=0))
-    sl()
 
+    sl()
     val_manquantes = df[df.isnull().any(axis=1)]
     print(val_manquantes)
 
@@ -61,6 +70,7 @@ if __name__ == "__main__":
 
     sl()
     print(df.shape)
+    print("Nettoyage...")
     df.dropna(inplace=True)
     print(df.shape)
 
@@ -71,19 +81,23 @@ if __name__ == "__main__":
     print(df.describe())
 
     sl()
-    print("1548".isdigit())
+    print("1548.isdigit() :", "1548".isdigit())
 
     sl()
+    cls()
     print(df[df["Order Date"] == "Order Date"])
-    print((df["Order Date"].str.strip() == "Order Date").any())
 
-    # print(df.loc[~df["Order ID"].str.isdigit(), :])
-    # print((df['Order Date']))
+    sl()
+    print(df.shape)
     mask = df["Order Date"].str.strip() == "Order Date"
     df_clean = df.drop(df[mask].index)
     print("Lignes supprimées :", mask.sum())
     print("Nouveau shape :", df_clean.shape)
-    print(df_clean.loc[~df_clean["Order ID"].str.isdigit(), :])
+    print(
+        'Lignes avec "Order Date" :\n→ ',
+        df_clean.loc[~df_clean["Order ID"].str.isdigit(), :],
+        sep="",
+    )
 
     sl()
     print(df_clean.head(3))
@@ -96,6 +110,7 @@ if __name__ == "__main__":
     print(df_clean.info())
 
     sl()
+    cls()
     # df_clean["Order Date"] = pd.to_datetime(df_clean["Order Date"])
     df_clean["Order Date"] = pd.to_datetime(
         df_clean["Order Date"], format="%m/%d/%y %H:%M", errors="coerce"
@@ -122,7 +137,6 @@ if __name__ == "__main__":
     )
 
     sl()
-
     df_affichage = pd.DataFrame(
         {
             "df['Order Date']": df["Order Date"].reset_index(drop=True),
@@ -132,13 +146,13 @@ if __name__ == "__main__":
             "df_clean['Order Date']": df_clean["Order Date"].reset_index(drop=True),
         }
     )
-
     print(df_affichage)
 
     sl()
     print(df_clean)
     print(df_clean.index)
 
+    sl()
     df_clean = df_clean.set_index("Order Date")
     print(df_clean)
 
@@ -147,6 +161,7 @@ if __name__ == "__main__":
     print(df_clean)
 
     sl()
+    cls()
     df_clean.sort_index(inplace=True)
     print(df_clean)
 
@@ -180,9 +195,9 @@ if __name__ == "__main__":
     sl()
     df_ca_grouped_by_month = df_clean.groupby("Month").sum(["chiffre_daffaire"])
     print(df_ca_grouped_by_month.loc[monthes, ["chiffre_daffaire"]])
-    # df_ca_grouped_by_month.loc[monthes, ["chiffre_daffaire"]].plot.bar(figsize=(13, 8))
-    # plt.title("Chiffre d'affaire global par mois")
-    # plt.show()
+    df_ca_grouped_by_month.loc[monthes, ["chiffre_daffaire"]].plot.bar(figsize=(13, 8))
+    plt.title("Chiffre d'affaire global par mois")
+    plt.show()
     print(df_ca_grouped_by_month.loc[monthes, ["chiffre_daffaire"]].max())
     ca_dec = float(
         df_ca_grouped_by_month["chiffre_daffaire"].sort_values(ascending=False).December
@@ -194,9 +209,13 @@ if __name__ == "__main__":
     )
 
     sl()
+    cls()
+    print(df_clean[["Order ID", "Purchase Address", "chiffre_daffaire"]].head(3))
+
+    sl()
+    print("Adresses d'achat uniques :")
     print(df_clean["Purchase Address"].unique())
 
-    # plt.savefig("ca_par_mois.png")
     def get_ville(addresse):
         return addresse.split(",")[1].strip()
 
@@ -205,20 +224,22 @@ if __name__ == "__main__":
 
     sl()
     df_clean["Ville"] = df_clean["Purchase Address"].apply(get_ville)
-    print(df_clean.sample(5))
+    print(df_clean.head(3))
     print("Villes uniques :")
     print(*enumerate(df_clean["Ville"].unique()), sep="\n")
 
+    sl()
     ca_by_city = (
         df_clean.groupby("Ville").sum()["chiffre_daffaire"].sort_values(ascending=False)
     )
-    print(ca_by_city)
+    print("CA par ville :\n", ca_by_city)
 
-    # plt.title("Chiffre d'affaire global par ville")
-    # #ca_by_city.plot.barh(figsize=(8, 6))
-    # ca_by_city.plot.bar(figsize=(8, 6))
-    # plt.show()
+    plt.title("Chiffre d'affaire global par ville")
+    # ca_by_city.plot.barh(figsize=(8, 6))
+    ca_by_city.plot.bar(figsize=(8, 5))
+    plt.show()
 
+    cls()
     sl()
     df_clean["Heure"] = df_clean.index.hour
     ca_par_heure = pd.DataFrame(df_clean.groupby("Heure")["chiffre_daffaire"].sum())
@@ -237,3 +258,4 @@ if __name__ == "__main__":
         .sort_values(ascending=False)
         .head(7)
     )
+    # plt.savefig("ca_par_mois.png")
