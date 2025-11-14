@@ -163,13 +163,13 @@ if __name__ == "__main__":
     df["duration_minutes"] = df["duration"] / 60
 
     # 3. Tracer la courbe
-    # plt.figure(figsize=(8, 15))
-    # plt.plot(df["upload_date"], df["duration"], marker="o")
-    # plt.xlabel("Date de publication")
-    # plt.ylabel("Durée (minutes)")
-    # plt.title("Durée des vidéos publiées au fil du temps")
-    # plt.grid(True)
-    # plt.show()
+    plt.figure(figsize=(8, 15))
+    plt.plot(df["upload_date"], df["duration"], marker="o")
+    plt.xlabel("Date de publication")
+    plt.ylabel("Durée (minutes)")
+    plt.title("Durée des vidéos publiées au fil du temps")
+    plt.grid(True)
+    plt.show()
 
     # Regroupe par semaine et sommer les minutes
     weekly_prod = df.resample("W", on="upload_date")["duration"].sum()

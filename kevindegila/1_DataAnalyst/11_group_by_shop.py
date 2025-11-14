@@ -259,3 +259,5 @@ if __name__ == "__main__":
         .head(7)
     )
     # plt.savefig("ca_par_mois.png")
+    sl()
+    print('Ready.')

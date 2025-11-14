@@ -4,12 +4,10 @@ import seaborn as sns
 import numpy as np
 import os
 
-
-def sl():
-    w = 99
-    print("─" * w + "→")
-
+from tools import *
 
 if __name__ == "__main__":
 
-    sl()
+    cls()
+    print('Ready.')
+    sl(350)

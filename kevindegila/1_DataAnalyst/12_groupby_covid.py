@@ -3,15 +3,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import os
-
-
-def sl():
-    w = 99
-    print(" ─" * (w // 2), "→")
+from tools import *
 
 
 if __name__ == "__main__":
 
+    cls()
+
+    w = 399
     pathFile = "D:\\fastapi\\kevindegila\\1_DataAnalyst\\datasets\\COVID-19-geographic-disbtribution-worldwide-2020-12-14.xls"
     if os.path.exists(pathFile):
         df = pd.read_excel(pathFile)
@@ -25,14 +24,15 @@ if __name__ == "__main__":
     print(df.isna().sum())
 
     sl()
-    print("Nombre des NaN :", df.isna().sum().sum())
+    nans = df.isna().sum().sum()
+    print("Nombre total des NaN :", nans)
 
     sl()
-    print("% des NaN :", f"{df.isna().sum().sum()/len(df)*100:,.2f} %")
+    print("% des NaN :", f"{nans.sum()/len(df)*100:,.2f} %")
     print(df.shape)
 
     sl()
-    print("comme peu important (5% des données), on drop les NaN")
+    print("comme peu important (5 % des données), on drop les NaN")
     df.dropna(inplace=True)
 
     sl()
@@ -42,7 +42,6 @@ if __name__ == "__main__":
     print("Nouveau shape :", df.shape)
 
     sl()
-
     df_c_by_country = (
         df.groupby("countriesAndTerritories")[["cases", "deaths"]]
         .sum()
@@ -52,19 +51,23 @@ if __name__ == "__main__":
     df_c_by_country["%"] = (
         df_c_by_country["deaths"] / df_c_by_country["cases"] * 100
     ).round(2)
+    # pd.set_option("display.max_rows", None)  # Afficher toutes les lignes
+    # pd.set_option('display.max_columns', None)  # Afficher toutes les colonnes si besoin
     print(df_c_by_country.sort_values("%", ascending=False))
+    # print(df_c_by_country)
+
+    # # Graphique du top 5 de décès avec noms de pays en abscisse
     top5 = df_c_by_country.sort_values("%", ascending=False).head(5)
+    plt.figure(figsize=(8, 6))
+    plt.bar(top5["countriesAndTerritories"], top5["%"])
+    plt.xlabel("Pays")
+    plt.ylabel("Taux de mortalité (%)")
+    plt.title("Top 5 des pays par taux de mortalité")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
 
-    # # Graphique avec noms de pays en abscisse
-    # plt.figure(figsize=(8, 6))
-    # plt.bar(top5["countriesAndTerritories"], top5["%"])
-    # plt.xlabel("Pays")
-    # plt.ylabel("Taux de mortalité (%)")
-    # plt.title("Top 5 des pays par taux de mortalité")
-    # plt.xticks(rotation=45)
-    # plt.tight_layout()
-    # plt.show()
-
+    # exit()
     # Agrégation par continent
     df_c_by_continent = (
         df.groupby("continentExp")[["cases", "deaths"]]
@@ -96,3 +99,6 @@ if __name__ == "__main__":
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
+
+    sl()
+    print("Ready.")
