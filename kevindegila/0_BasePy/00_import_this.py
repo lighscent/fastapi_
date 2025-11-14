@@ -1,18 +1,12 @@
-import codecs, os, random, sys, this
+import codecs, random, this
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-tools_path = os.path.abspath(os.path.join(current_dir, "..", ".."))
-sys.path.append(tools_path)
-from tools.utils import *
+from tools import *
 
 if __name__ == "__main__":
 
-    w = 97
     # cls()
-    sl(w)
-    print(current_dir, "\n", tools_path)
 
-    sl(w)
+    sl()
     lines = this.s.strip().split("\n")
     lines = [l for l in lines if l.strip()]
 
@@ -24,4 +18,3 @@ if __name__ == "__main__":
         codecs.decode(a_random_dentence, "rot_13"),
     )
     print("(See CLI above to see all this.s if cls() is commented...)")
-    sl(w)

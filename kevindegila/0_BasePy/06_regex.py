@@ -1,11 +1,6 @@
-import os, sys
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-tools_path = os.path.abspath(os.path.join(current_dir, "..", ".."))
-sys.path.append(tools_path)
-from tools.utils import *
-
+from tools import *
 import re
+
 
 # réf.: http://www.regex101.com
 if __name__ == "__main__":
@@ -37,7 +32,7 @@ if __name__ == "__main__":
     # Utilisation du pattern compilé
     tr = pattern.sub(replacer, clean)
     print(tr)  # → La date est 25/09/2025.
-    
+
     sl()
     print(
         # pattern.sub(lambda m: f"{m.group(3)}/{m.group(2)}/{m.group(1)}", clean)
