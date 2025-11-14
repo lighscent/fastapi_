@@ -3,7 +3,7 @@ import codecs, os, random, sys, this
 current_dir = os.path.dirname(os.path.abspath(__file__))
 tools_path = os.path.abspath(os.path.join(current_dir, "..", ".."))
 sys.path.append(tools_path)
-from tools import *
+from tools.utils import *
 
 if __name__ == "__main__":
 

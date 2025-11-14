@@ -1,3 +1,17 @@
+# FastAPI (Mais en fait: Bases numpy, pandas, matplolib, etc... Pour ML [Machine Learning])
+
+## Installation au départ
+
+```bash
+# Active ton venv (Exemple si ton dossier du projet est dans D:/fastapi/)
+& D:/fastapi/.venv/Scripts/activate
+
+# Installe ton package tools en mode editable
+pip install -e .
+```
+
+## FastAPI
+
 Aujourd’hui
 c'est quoi FastAPI ?
 FastAPI est un framework web moderne et ultra performant conçu pour créer des API RESTful avec Python, à partir de la version 3.62. Voici ce qui le rend si spécial :
@@ -7,7 +21,9 @@ Rapidité : Comparable à Node.js ou Go grâce à son architecture basée sur St
 
 Asynchrone : Gère des milliers de requêtes simultanées avec async/await.
 
-Documentation automatique : Génère des interfaces interactives comme Swagger UI et Redoc grâce à OpenAPI.
+Documentation automatique : Génère des interfaces
+
+ interactives comme Swagger UI et Redoc grâce à OpenAPI.
 
 Validation des données : Utilise les annotations de type Python pour sécuriser et valider les entrées.
 

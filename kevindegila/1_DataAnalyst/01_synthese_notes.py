@@ -1,9 +1,15 @@
 import numpy as np
 from tabulate import tabulate
 
+from tools import *
+
+cls()
 
 n = np.arange(1, 10)
 print(np.vstack([n, n**2, n**3]))
+
+sl()
+print("Synthèse - Notes et statistiques avec NumPy")
 
 notes = np.random.randint(21, size=(3, 5))
 

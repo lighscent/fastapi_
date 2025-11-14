@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import os
-from tools import *
+from tools.utils import *
 
 
 if __name__ == "__main__":
