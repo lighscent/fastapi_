@@ -10,7 +10,7 @@ import os, sys
 # from tools import *
 
 
-def sl(w=17):
+def sl(w=77):
     print("─" * w, "\b→")  # Ligne séparatrice
 
 
