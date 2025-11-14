@@ -1,11 +1,19 @@
 from textwrap import indent
-from sl import sl
 import json
 from urllib.request import urlopen
 from pprint import pprint
 
+import os, sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+tools_path = os.path.abspath(os.path.join(current_dir, "..", ".."))
+sys.path.append(tools_path)
+from tools import *
+
+
 if __name__ == "__main__":
-    sl()
+    
+    cls()
 
     req = urlopen("https://api.github.com/users/kevindegila")
     # req = urlopen("https://api.github.com/users/grcote7")
@@ -16,7 +24,7 @@ if __name__ == "__main__":
     pprint(data)
 
     sl()
-    print(data["blog"])
+    print(data["bio"])
 
     with open("datasets/github_user.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
