@@ -20,6 +20,9 @@ if __name__ == "__main__":
     print(f"Vecteur de base j original: {j}")
     print(f"Vecteur de base i transformé: {i_transformed}")
     print(f"Vecteur de base j transformé: {j_transformed}")
+    
+    print(i_transformed.shape, '=', i.shape, '→', i_transformed.reshape(2,1).shape)
+    # i[:, None] = i.reshape(2,1) = i[:, np.newaxis]
 
     # Plotting the transformation
     plt.figure(figsize=(8, 8))
