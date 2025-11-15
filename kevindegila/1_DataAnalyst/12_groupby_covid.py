@@ -10,8 +10,9 @@ if __name__ == "__main__":
 
     cls()
 
-    w = 399
-    pathFile = "D:\\fastapi\\kevindegila\\1_DataAnalyst\\datasets\\COVID-19-geographic-disbtribution-worldwide-2020-12-14.xls"
+    w = 237
+
+    pathFile = "datasets\\COVID-19-geographic-disbtribution-worldwide-2020-12-14.xls"
     if os.path.exists(pathFile):
         df = pd.read_excel(pathFile)
     else:
@@ -20,28 +21,29 @@ if __name__ == "__main__":
 
     print(df)
 
-    sl()
+    sl(w)
     print(df.isna().sum())
 
-    sl()
+    # exit()
+    sl(w)
     nans = df.isna().sum().sum()
     print("Nombre total des NaN :", nans)
 
-    sl()
+    sl(w)
     print("% des NaN :", f"{nans.sum()/len(df)*100:,.2f} %")
-    print(df.shape)
+    print('shape :', df.shape)
 
-    sl()
+    sl(w)
     print("comme peu important (5 % des données), on drop les NaN")
     df.dropna(inplace=True)
 
-    sl()
+    sl(w)
     print("Nouveau nombre des NaN :", df.isna().sum().sum())
 
-    sl()
+    sl(w)
     print("Nouveau shape :", df.shape)
 
-    sl()
+    sl(w)
     df_c_by_country = (
         df.groupby("countriesAndTerritories")[["cases", "deaths"]]
         .sum()
@@ -51,11 +53,13 @@ if __name__ == "__main__":
     df_c_by_country["%"] = (
         df_c_by_country["deaths"] / df_c_by_country["cases"] * 100
     ).round(2)
+    print(f"{df_c_by_country.shape[0]} pays dans le dataset ({df_c_by_country.shape[1]} colonnes):")
     # pd.set_option("display.max_rows", None)  # Afficher toutes les lignes
     # pd.set_option('display.max_columns', None)  # Afficher toutes les colonnes si besoin
     print(df_c_by_country.sort_values("%", ascending=False))
     # print(df_c_by_country)
 
+    # exit()
     # # Graphique du top 5 de décès avec noms de pays en abscisse
     top5 = df_c_by_country.sort_values("%", ascending=False).head(5)
     plt.figure(figsize=(8, 6))
@@ -100,5 +104,5 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.show()
 
-    sl()
+    sl(w)
     print("Ready.")

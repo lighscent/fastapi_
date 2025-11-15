@@ -1,3 +1,4 @@
+from tools import *
 import numpy as np
 import pandas as pd
 import os
@@ -5,15 +6,10 @@ import os
 import matplotlib.pyplot as plt
 
 
-def cls():
-    os.system("cls" if os.name == "nt" else "clear")
-
-
 if __name__ == "__main__":
 
     cls()
-
-    w = 178
+    w = 237
 
     local_path = "datasets/Automobile_data.csv"
 
@@ -31,43 +27,43 @@ if __name__ == "__main__":
         auto.to_csv(local_path, index=False)
         print("Fichier téléchargé et sauvegardé en local :", local_path)
 
-    print("-" * w)
+    sl(w)
     print(auto)
-
-    print("-" * w)
+    
+    sl(w)
     print(auto.describe())
 
-    print("-" * w)
+    sl(w)
     print(auto.describe().T)
 
-    print("-" * w)
+    sl(w)
     print(auto["body-style"].value_counts())
 
-    print("-" * w)
+    sl(w)
     print("auto.groupby('body-style').groups :")
     print(auto.groupby("body-style").groups)
 
-    print("-" * w)
+    sl(w)
     print("auto.groupby('body-style').groups.keys() :")
     print(auto.groupby("body-style").groups.keys())
 
-    print("-" * w)
+    sl(w)
     print("auto.groupby('body-style').groups.values() :")
     print(auto.groupby("body-style").groups.values())
 
-    print("-" * w)
+    sl(w)
     print("auto.groupby('body-style').get_group('convertible') :")
     style = auto.groupby("body-style")
     print(style.get_group("convertible"))
 
-    print("-" * w)
+    sl(w)
     print(auto["drive-wheels"].value_counts())
 
     double_groupin = auto.groupby(["body-style", "drive-wheels"])
 
     print("\ndouble groups", "─" * (w - 14))
     print(double_groupin.groups)
-
+    
     print("\ndouble groupby", "─" * (w - 15))
     print(double_groupin.size())
 
@@ -115,12 +111,10 @@ if __name__ == "__main__":
     print("\n\ndescribe", "─" * (w - 9) + "\n")
     print(style.describe())
 
-
     print("\n\nstyle['city-mpg'].mean()", "─" * (w - 25) + "\n")
     mean_val = style["city-mpg"].mean()
     print(mean_val)
     print(mean_val.describe())
-
 
     # print(style["city-mpg"].mean().plot(kind="bar"))
     mean_val.plot(kind="bar")

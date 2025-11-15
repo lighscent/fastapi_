@@ -1,3 +1,4 @@
+from tools import *
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,7 +8,7 @@ if __name__ == "__main__":
 
     w = 178
 
-    print("-" * w)
+    sl(w)
 
     # x = ["2016", "2017", "2018", "2019"]
     # y = [3, 8, 5, 12]
@@ -20,6 +21,7 @@ if __name__ == "__main__":
     df = pd.DataFrame(data, columns=["Années", "Valeurs"])
     x = df["Années"]
     y = df["Valeurs"]
+    print(df)
 
     # Version directe avec pandas
     # df.plot(

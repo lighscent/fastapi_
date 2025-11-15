@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 cls()
 x = np.array([[1, 2, 3], [4, 5, 6]])
+# x = np.delete(x, 0, axis=0) <=> x.drop(0) d'un df (pandas)
 print(f"{x.shape[0]} lignes, {x.shape[1]} colonnes :")
 print(x)
 

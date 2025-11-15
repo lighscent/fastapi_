@@ -1,9 +1,9 @@
-
 # Code à mettre au début de chaque script utilisant tools.py
 # Récupère le chemin absolu du dossier du script
 # Chemin vers le dossier où se trouve tools.py (remonte de 2 niveaux)
 # Ajoute au path
 import os, sys
+
 # current_dir = os.path.dirname(os.path.abspath(__file__))
 # tools_path = os.path.abspath(os.path.join(current_dir, "..", ".."))
 # sys.path.append(tools_path)
@@ -11,7 +11,7 @@ import os, sys
 
 
 def sl(w=99):
-    print("─" * w, "\b→")  # Ligne séparatrice
+    print("─" * (w - 1), "\b→")  # Ligne séparatrice
 
 
 def cls():

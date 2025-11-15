@@ -1,8 +1,7 @@
+from tools import *
 import numpy as np
 import pandas as pd
-import math, os
 from tabulate import tabulate
-import urllib.request
 
 from subs.get_json import get_movies
 
@@ -13,6 +12,7 @@ print("-" * 111)
 if __name__ == "__main__":
     movie = get_movies()
 
+    cls()
     # print(
     #     movie.loc[4:8, ["duration", "gross", "actor_2_name", "director_facebook_likes"]]
     # )
@@ -22,10 +22,10 @@ if __name__ == "__main__":
         "Le 4ème film avec K. SPACEY:",
         movie[movie["actor_1_name"] == "Kevin Spacey"]["movie_title"][4:5],
     )
-    print("-" * 111)
+    sl()
 
     d = movie["duration"]
-    print("Moyenne:", f"{d.mean():.2f}", "\n\bÉcart-type:", f"{d.std():.2f}")
+    print("Durée moyenne:", f"{d.mean():.2f}", "\n\bÉcart-type   :", f" {d.std():.2f}")
     # exit()
     import matplotlib.pyplot as plt
 
