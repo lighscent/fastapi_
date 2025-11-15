@@ -1,17 +1,18 @@
+from tools import *
 import numpy as np
 from tabulate import tabulate
 
-from tools import *
-
 cls()
 
-n = np.arange(1, 10)
-print(np.vstack([n, n**2, n**3]))
+# n = np.arange(1, 11)
+# print(np.vstack([n, n**2, n**3]))
 
-sl()
+# sl()
 print("Synthèse - Notes et statistiques avec NumPy")
 
 notes = np.random.randint(21, size=(3, 5))
+
+print(notes)
 
 row_means = np.mean(notes, axis=1)
 col_means = np.mean(notes, axis=0)
@@ -38,9 +39,15 @@ headers = (
 
 print(tabulate(table, headers=headers, tablefmt="grid"))
 
-print("-" * 89)
 
+sl()
+
+print("Autre classe (de 5 élèves) :")
 # Math, Physique, SVT
+matieres = np.array(["Math", "Physique", "SVT"])
+# Détermine la largeur maximale des noms de matières
+largeur = max(len(m) for m in matieres)
+
 x = np.array(
     [
         [6, 8, 4],
@@ -51,41 +58,50 @@ x = np.array(
     ]
 )
 
+print(x)
 moyennes = np.mean(x, axis=1)
-
 print("Moyennes des élèves :", moyennes)
 
 for i, m in enumerate(moyennes, 1):
     print(f"Élève {i} : {m:.2f}")
-print("-" * 89)
 
 moyennes = np.mean(x, axis=1)
 table = [[f"Élève {i+1}", f"{m:.2f}"] for i, m in enumerate(moyennes)]
-# print(tabulate(table, headers=["Étudiant", "Moyenne"], tablefmt="grid"))
-# print("-" * 89)
+print(tabulate(table, headers=["Étudiant", "Moyenne"], tablefmt="grid"))
 
-# print(x[x > 10])
-# print("-" * 89)
+sl()
+# Moyenne par matière
+moyennes_matieres = np.mean(x, axis=0)
+print("Moyennes par matière :")
+for j, m in enumerate(moyennes_matieres, 1):
+    print(f"{matieres[j-1]:<{largeur}} : {m:.2f}")
+
+table = [[matieres[j], f"{m:.2f}"] for j, m in enumerate(moyennes_matieres)]
+print(tabulate(table, headers=["Matière", "Moyenne"], tablefmt="grid"))
+
+sl()
+# cls()
+
+print(x)
+
+print('Notes sup à 10 :', x[x > 10])
+
+print("Indices des notes supérieures à 10 :")
 indices = np.argwhere(x > 10)
+print(indices)
+
+# sl()
 # for i, j in indices:
 #     print(f"Élève {i+1}, Matière {j+1} : {x[i, j]}")
+
+sl()
+print(*[f"\bÉlève {i+1}, Matière {j+1} : {x[i, j]}\n" for i, j in indices])
+
 # print("-" * 89)
 
-# print(*[f"\bÉlève {i+1}, Matière {j+1} : {x[i, j]}\n" for i, j in indices])
-
-# print("-" * 89)
-
-# Math, Physique, SVT
-x = np.array(
-    [
-        [6, 8, 4],
-        [12, 10, 7],
-        [8, 13, 11],
-        [5, 7, 6],
-        [10, 2, 11],
-    ]
-)
-
+sl()
+print ('Notes de l\'élève 1:', x[0, :])  # Toutes les notes de l'élève 1
+print ('Notes de physique :', x[:, 1])  # Toutes les notes de Physique
 # notes_sup_5 = np.sum(x > 5)
 # notes_sup_8_students = np.sum(x > 8, axis=1)
 # nb_student_with_2_notes_sup_8 = np.sum(notes_sup_8_students >= 2)
@@ -109,7 +125,9 @@ moyenne_math_physique_premiers_eleves = np.mean(x[:3, :2])
 
 # la médiane des moyennes (elèves)
 mediane_moyennes_eleves = np.median(np.mean(x, axis=1))
-print(mediane_moyennes_eleves)
+sl()
+print(f"{mediane_moyennes_eleves = }")
+exit()
 
 # Combien d'élèves ont au moins 2 notes supérieurs à la médiane des moyennes (élèves) de la classe ?
 notes_sup_mediane = np.sum(x > mediane_moyennes_eleves, axis=1)

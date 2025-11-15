@@ -1,3 +1,4 @@
+from tools import *
 import numpy as np
 import pandas as pd
 import math, os
@@ -6,10 +7,14 @@ import urllib.request
 
 from subs.get_json import get_movies
 
+
 if __name__ == "__main__":
     movie = get_movies()
 
+cls()
+
 print("Movie info", movie.info())
+exit()
 print(movie.head(3))
 print(movie.tail(3))
 print(movie)
