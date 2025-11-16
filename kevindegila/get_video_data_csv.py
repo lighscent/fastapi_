@@ -10,6 +10,7 @@ AUTHOR = "KevinDegila"
 # AUTHOR = "c57-u5s"
 # AUTHOR = "doro2255"
 # AUTHOR = "LionelCOTE"
+AUTHOR = "MachineLearnia"
 
 TEST = 0
 
@@ -80,6 +81,7 @@ def display_videos_table(df):
         views = row.get("view_count")
         likes = row.get("like_count")
         ratio = likes / views * 100
+        url = row.get("url", "N/A")
         table_data.append(
             [
                 format_date(row["upload_date"]),
@@ -88,7 +90,7 @@ def display_videos_table(df):
                 views,
                 f"{likes} ({ratio:.1f}" + " %)",
                 row.get("comment_count") if pd.notna(row.get("comment_count")) else 0,
-                # len(row.get("comment_count")) if pd.notna(row.get("comment_count")) else 0,
+                format_title(url)
             ]
         )
 
@@ -97,7 +99,7 @@ def display_videos_table(df):
     likes = df["like_count"].sum()
     ratio = likes / views * 100
     table_data.append(
-        ["Date", "Titre", "Durée", "Views", "Likes ( % views)", "Commentaires"]
+        ["Date", "Titre", "Durée", "Views", "Likes ( % views)", "Commentaires", 'url']
     )
     table_data.append(
         [
@@ -109,6 +111,7 @@ def display_videos_table(df):
             views,
             f"{likes} ({ratio:.1f}" + " %)",
             df["comment_count"].sum(),
+            'xxx'
         ]
     )
 
@@ -147,10 +150,19 @@ if __name__ == "__main__":
         exit(1)
     df = df.sort_values("upload_date", ascending=False)
 
+    # print(df.info())
+    # print(df[1:2])
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.expand_frame_repr", False) # Empêche le retour à la ligne
+    display_videos_table(df.head(1))
+    
+    exit()
+
     # Afficher le tableau
     # display_videos_table(df[1:2])
     display_videos_table(df)
 
+    exit()
     print(df)
 
     import pandas as pd
