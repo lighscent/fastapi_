@@ -19,6 +19,7 @@ def cls():
     # Envoie directement les codes ANSI pour effacer l'écran (+ robuste)
     sys.stdout.write("\033[H\033[J")
     sys.stdout.flush()
+    print()
 
 
 if __name__ == "__main__":
