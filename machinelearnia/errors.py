@@ -169,12 +169,25 @@ def exemple7():
 
 
 def exemple8():
-    print(123)
+    cls()
+    ms = pd.read_csv("datasets/movie.csv")
+    print(ms.shape, ms, sep="\n")
+
+
+def exemple9():
+    def div(a, b):
+        try:
+            return a / b
+        except ZeroDivisionError:
+            print(f"Division de {a} par {b} interdite !")
+            return False
+
+    print(div(1, 0))
 
 
 if __name__ == "__main__":
 
-    w = 63
+    w = 55
 
     cls()
 
@@ -185,8 +198,10 @@ if __name__ == "__main__":
     # exemple4()
     # exemple5()
     # exemple6() # make_reression()
-    # exemple7()
-    exemple8()
+    # exemple7() # Aff des neighbors
+    # exemple8() # file not found
+    exemple9() # Division par 0
 
     sleep(1)
     sl(w)
+    print('Ready.')
