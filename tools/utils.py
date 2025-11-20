@@ -14,12 +14,13 @@ def sl(w=99):
     print("─" * (w - 1), "\b→")  # Ligne séparatrice
 
 
-def cls():
+def cls(empty_line=1):
     os.system("cls" if os.name == "nt" else "clear")
     # Envoie directement les codes ANSI pour effacer l'écran (+ robuste)
     sys.stdout.write("\033[H\033[J")
     sys.stdout.flush()
-    # print()
+    if empty_line:
+        print()
 
 
 if __name__ == "__main__":
