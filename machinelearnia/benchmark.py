@@ -16,7 +16,8 @@ if __name__ == "__main__":
 
     print(f"... {n}")
     print(f"Boucle classique : {(top.time() - s):.2f}\"")
-
+    
+    sl(w)
     print(prevent)
     s = top.time()
     print(*(i for i in range(n) if i < 9), end="\b")
