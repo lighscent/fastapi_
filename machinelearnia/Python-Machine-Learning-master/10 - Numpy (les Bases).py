@@ -132,5 +132,5 @@ def initialisation(m, n):
 
 X = initialisation(3, 4)
 
-pass
+pass # Pour mettre point d'arrêt
 # %%
