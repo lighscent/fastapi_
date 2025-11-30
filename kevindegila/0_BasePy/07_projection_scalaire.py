@@ -62,6 +62,7 @@ if __name__ == "__main__":
         scale=1,
         color="g",
         label=projection_label,
+        alpha=0.5,
     )
 
     # Add a dashed line from the tip of w to the tip of its projection on v

@@ -36,7 +36,7 @@ plt.boxplot(x)
 plt.title("Box-plot des données")
 plt.xlabel("Élèves")
 plt.ylabel("Notes")
-# plt.show()
+plt.show()
 
 sl()
 x_centre_et_reduit = (x - xmean) / xstd

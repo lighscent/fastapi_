@@ -41,6 +41,7 @@ if __name__ == "__main__":
     # sns.pairplot(data=titanic, hue="survived")
 
     # plt.tight_layout()
+    plt.legend()
     plt.show()
 
     # Doc Seaborn: https://seaborn.pydata.org/tutorial.html

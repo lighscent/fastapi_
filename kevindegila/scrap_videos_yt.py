@@ -26,7 +26,7 @@ AUTHOR = "KevinDegila"
 # AUTHOR = "c57-u5s"
 # AUTHOR = "doro2255"
 # AUTHOR = "LionelCOTE"
-AUTHOR = "MachineLearnia"
+# AUTHOR = "MachineLearnia"
 
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
 CACHE_DIR = "D:/fastapi/kevindegila/cache"

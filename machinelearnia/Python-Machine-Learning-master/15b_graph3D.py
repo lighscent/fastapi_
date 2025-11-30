@@ -5,6 +5,9 @@ from sklearn.datasets import load_iris
 # Nécessite pip install tk
 
 iris = load_iris()
+print(iris.keys())
+
+# exit()
 x = iris.data
 y = iris.target
 names = list(iris.target_names)

@@ -26,7 +26,7 @@ plt.axhline(
 
 plt.xlabel("Budget (€)")
 plt.ylabel("Nombre de bières")
-plt.title("Comparaison : bières à 0.85€ vs. 1.25€")
+plt.title("Comparaison : Bières à 0.85€ vs. 1.25€")
 plt.grid(True)
-plt.legend()
+# plt.legend()
 plt.show()
