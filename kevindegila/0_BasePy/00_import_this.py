@@ -1,13 +1,18 @@
-import codecs, random, this
-
 from tools import *
 
 if __name__ == "__main__":
 
-    # cls()
+    w = 57
+    cls()
+    import codecs, random, this
 
-    sl()
+    # sl(w)
     lines = this.s.strip().split("\n")
+    # print(len(lines))  # Ruler
+    # lines = [l for l in lines if l.strip()]
+    # print(len(lines))  # Ruler
+
+    sl(w)
     lines = [l for l in lines if l.strip()]
 
     a_random_dentence = random.choice(lines)
