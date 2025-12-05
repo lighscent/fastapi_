@@ -2,6 +2,9 @@ import streamlit as st
 from PIL import Image
 import requests
 
+# Pour lancer
+# streamlit run d:/fastapi/kevindegila/poubelleIntelligente/frontend.py 
+
 # Vide les caches
 # st.cache_data.clear()
 # st.cache_resource.clear()

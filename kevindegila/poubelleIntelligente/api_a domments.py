@@ -1,11 +1,23 @@
 from fastapi import FastAPI, UploadFile
+
 from tensorflow.keras.models import load_model
 import numpy as np
 import io
 from PIL import Image
 from contextlib import asynccontextmanager
 
+# Pour lancer
+# uvicorn kevindegila.poubelleIntelligente.api:app --reload --host 127.0.0.1 --port 8000
+
+app = FastAPI()
 model = None  # modèle global
+
+# Ref.: https://www.youtube.com/watch?v=NhzqPSvT4A8
+
+
+@app.get("/")
+def great() -> dict:
+    return {"message": "Bonjour 777"}
 
 
 @asynccontextmanager
@@ -30,16 +42,23 @@ def preprocess(img):
     return img
 
 
-@app.get("/")
-def great() -> dict:
-    return {"message": "Bonjour 777"}
+# Chargement du model
+# model = load()
 
 
 @app.post("/predict")
 async def predict(file: UploadFile) -> dict:
+    # lire le fichier image
     image_data = await file.read()
+
+    # ouvrir l'image
     img = Image.open(io.BytesIO(image_data))
+
+    # traitement de l'image
     img_processed = preprocess(img)
+
+    # prediction
     predictions = model.predict(img_processed)
     rec = predictions[0][0].tolist()
+
     return {"prediction": rec}
