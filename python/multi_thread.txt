@@ -1,0 +1,70 @@
+Voici un exemple concret pour utiliser concurrent.futures et faire du multithreading ou multiprocessing facilement en Python. 🚀
+
+1️⃣ Exemple : tâches lentes (simulation)
+import time
+
+def travail(n):
+    print(f"Début tâche {n}")
+    time.sleep(2)  # simule une tâche lourde
+    print(f"Fin tâche {n}")
+    return n * n
+
+
+Si on fait ça séquentiellement :
+
+results = []
+for i in range(5):
+    results.append(travail(i))
+print(results)
+
+
+Temps total ≈ 10 secondes (2s × 5 tâches)
+
+2️⃣ Avec ThreadPoolExecutor (multithreading)
+from concurrent.futures import ThreadPoolExecutor
+
+with ThreadPoolExecutor() as executor:
+    futures = [executor.submit(travail, i) for i in range(5)]
+    
+    for f in futures:
+        print("Résultat:", f.result())
+
+
+Les tâches sont lancées en parallèle
+
+Temps total ≈ 2 à 3 secondes seulement
+
+Idéal pour I/O bound (réseaux, fichiers, APIs)
+
+3️⃣ Avec ProcessPoolExecutor (multiprocessing)
+from concurrent.futures import ProcessPoolExecutor
+
+with ProcessPoolExecutor() as executor:
+    results = list(executor.map(travail, range(5)))
+
+print("Résultats finaux:", results)
+
+
+Chaque tâche tourne dans un processus séparé
+
+Temps total ≈ 2 secondes aussi
+
+Idéal pour CPU bound (calculs lourds, traitement de données)
+
+4️⃣ Avantages de concurrent.futures
+
+API simple : submit / map
+
+Gestion automatique des threads/processus
+
+Possibilité de récupérer les résultats avec .result()
+
+Gère les exceptions dans les tâches
+
+À retenir
+
+ThreadPoolExecutor → parallélisme léger (I/O bound)
+
+ProcessPoolExecutor → parallélisme lourd (CPU bound)
+
+Très facile à utiliser, pas besoin de gérer threading ou multiprocessing manuellement

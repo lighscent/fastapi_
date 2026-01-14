@@ -1,0 +1,59 @@
+❌ Sans générateur (mauvaise idée pour gros fichiers)
+def lire_fichier(path):
+    with open(path, "r") as f:
+        return f.readlines()  # charge TOUT en mémoire
+
+
+➡️ Problème : si le fichier fait plusieurs Go → 💥 mémoire.
+
+✅ Avec un générateur (yield)
+def lire_fichier(path):
+    with open(path, "r") as f:
+        for ligne in f:
+            yield ligne.strip()
+
+
+Utilisation :
+
+for ligne in lire_fichier("gros_fichier.log"):
+    if "ERROR" in ligne:
+        print(ligne)
+
+Ce qui se passe
+
+Une seule ligne est en mémoire à la fois
+
+Le fichier est lu progressivement
+
+Parfait pour fichiers volumineux
+
+Autre exemple : traitement incrémental
+def lignes_erreur(path):
+    with open(path) as f:
+        for ligne in f:
+            if "ERROR" in ligne:
+                yield ligne
+
+for erreur in lignes_erreur("app.log"):
+    envoyer_alerte(erreur)
+
+Pourquoi yield est magique
+
+Quand Python rencontre yield :
+
+la fonction se met en pause
+
+elle reprend exactement où elle s’était arrêtée
+
+elle ne calcule que ce qui est demandé
+
+Comparaison rapide
+# liste → tout calculé d’un coup
+data = [x*x for x in range(10_000_000)]
+
+# générateur → calcul à la demande
+data = (x*x for x in range(10_000_000))
+
+À retenir
+
+yield = lazy evaluation → mémoire minimale, performance maximale pour gros volumes.

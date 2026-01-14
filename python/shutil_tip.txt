@@ -1,0 +1,70 @@
+Voici un exemple concret pour utiliser shutil, la bibliothèque standard Python pour une gestion de fichiers et dossiers robuste. 🚀
+
+1️⃣ Copier un fichier
+import shutil
+
+# Copier un fichier source vers une destination
+shutil.copy("source.txt", "destination.txt")
+
+
+Copie le contenu et les permissions du fichier
+
+Si destination.txt existe, il est écrasé
+
+2️⃣ Copier un dossier entier
+import shutil
+
+shutil.copytree("dossier_source", "dossier_destination")
+
+
+Copie tout le dossier et son contenu
+
+Crée dossier_destination automatiquement
+
+⚠️ l’erreur survient si dossier_destination existe déjà (Python <3.8)
+
+Avec Python ≥3.8 :
+
+shutil.copytree("dossier_source", "dossier_destination", dirs_exist_ok=True)
+
+3️⃣ Déplacer / renommer un fichier ou dossier
+shutil.move("fichier.txt", "nouveau_dossier/fichier.txt")
+
+
+Déplace ou renomme
+
+Fonctionne pour fichiers ou dossiers
+
+4️⃣ Supprimer un dossier entier
+import shutil
+
+shutil.rmtree("dossier_a_supprimer")
+
+
+Supprime tout le contenu du dossier de façon sécurisée
+
+Attention : irréversible
+
+5️⃣ Exemple pratique : backup rapide
+import shutil
+import time
+from pathlib import Path
+
+source = Path("projet")
+backup = Path(f"backup_projet_{int(time.time())}")
+
+shutil.copytree(source, backup)
+print(f"Backup créé : {backup}")
+
+
+Crée un backup horodaté automatiquement
+
+Idéal pour scripts d’automatisation
+
+✅ À retenir
+
+shutil = copie, déplacement, suppression de fichiers/dossiers
+
+Plus robuste que les fonctions de os seules
+
+Utile pour : sauvegardes, déploiement, scripts de nettoyage

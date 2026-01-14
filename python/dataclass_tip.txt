@@ -1,0 +1,76 @@
+En Python, les dataclasses servent à créer des classes dont le but principal est de stocker des données, sans écrire beaucoup de code répétitif (le boilerplate).
+
+Le problème sans @dataclass
+
+Quand tu veux une simple classe de configuration, tu écris souvent ceci :
+
+class Config:
+    def __init__(self, host: str, port: int, debug: bool = False):
+        self.host = host
+        self.port = port
+        self.debug = debug
+
+    def __repr__(self):
+        return f"Config(host={self.host}, port={self.port}, debug={self.debug})"
+
+
+➡️ Beaucoup de code pour juste stocker des valeurs.
+
+La solution : @dataclass
+
+Avec une dataclass, Python génère tout ça automatiquement.
+
+from dataclasses import dataclass
+
+@dataclass
+class Config:
+    host: str
+    port: int
+    debug: bool = False
+
+Ce que @dataclass fait pour toi
+
+Il génère automatiquement :
+
+__init__ (constructeur)
+
+__repr__ (affichage lisible)
+
+__eq__ (comparaison)
+
+(optionnellement) __hash__, __lt__, etc.
+
+Exemple :
+
+cfg = Config("localhost", 8080, debug=True)
+print(cfg)
+
+
+Résultat :
+
+Config(host='localhost', port=8080, debug=True)
+
+Pourquoi on dit « évite le boilerplate »
+
+Le boilerplate, c’est :
+
+le __init__
+
+l’affectation self.xxx = xxx
+
+les méthodes de base répétitives
+
+👉 @dataclass supprime tout ce code inutile, tout en restant clair et typé.
+
+Bonus : options utiles
+@dataclass(frozen=True)
+class Config:
+    host: str
+    port: int
+
+
+frozen=True → objet immuable (comme une config)
+
+order=True → comparaisons (<, >)
+
+slots=True (Python 3.10+) → moins de mémoire
