@@ -1,6 +1,6 @@
 # Process
 
-## Install venv
+## Install venv (Si pas Docker)
 
     cd dossier
     
@@ -15,14 +15,14 @@
     pip install "uvicorn[standard]"
     etc...
 
-## Lancer CLIs
+## Lancer CLIs (En LOCAL)
 
-    uvicorn api:app --reload
+    uvicorn api_local:app --reload
     → http://127.0.0.1:8000
     → http://127.0.0.1:8000/docs
     
     # Avec host et port personnalisés
-    → uvicorn api:app --reload --host 0.0.0.0 --port 8080
+    → uvicorn api_local:app --reload --host 0.0.0.0 --port 8080
     
     streamlit run frontend.py
     streamlit run frontend.py --server.runOnSave=true --server.fileWatcherType=auto

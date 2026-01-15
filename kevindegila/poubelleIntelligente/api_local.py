@@ -12,12 +12,9 @@ model = None  # modèle global
 async def lifespan(app: FastAPI):
     global model
     # Chargement du modèle au démarrage
-    # model_path = (
-    #     r"D:\\fastapi\\kevindegila\\2_DeepLearning_160\\CNN_Streamlit_APP\best_model.h5"
-    # )
-    # Chemin dans le container Docker
-    model_path = "/app/best_model.h5"
-
+    model_path = (
+        r"D:\\fastapi\\kevindegila\\2_DeepLearning_160\\CNN_Streamlit_APP\best_model.h5"
+    )
     model = load_model(model_path, compile=False)
     yield
     # Ici tu peux ajouter du code de nettoyage à l’arrêt (si besoin)

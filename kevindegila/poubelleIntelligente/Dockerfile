@@ -29,7 +29,10 @@ RUN pip install --no-cache-dir "uvicorn[standard]"
 RUN pip install --no-cache-dir python-multipart
 # RUN pip install --no-cache-dir streamlit==1.40.0 # ✅ Version compatible
 
+
 COPY . .
+COPY best_model.h5 /app/best_model.h5
+
 
 EXPOSE 8000
 
