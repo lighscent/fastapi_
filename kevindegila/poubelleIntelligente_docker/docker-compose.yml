@@ -1,0 +1,28 @@
+services:
+  api:
+    build: ./backend
+    container_name: fastapi_backend_dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - ENV=development
+      - RELOAD=true
+    networks:
+      - appnet
+    stdin_open: true
+    tty: true
+
+  streamlit:
+    build: ./frontend
+    container_name: streamlit_frontend
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    networks:
+      - appnet
+
+networks:
+  appnet:

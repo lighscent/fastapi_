@@ -1,0 +1,38 @@
+# docker compose -f docker-compose.dev.yml up --build -d
+# OU
+# docker compose -f docker-compose.dev.yml build --no-cache
+# docker compose -f docker-compose.dev.yml up -d
+# API → http://localhost:8000/docs
+# Frontend → http://localhost:8501
+
+# Pour débuguer: docker compose -f docker-compose.dev.yml build --no-cache --progress=plain
+
+services:
+  api:
+    build: ./backend
+    container_name: fastapi_backend_dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      # - ./frontend:/app
+    environment:
+      - ENV=development
+      - RELOAD=true
+    networks:
+      - appnet
+    stdin_open: true
+    tty: true
+
+  # streamlit:
+  #   build: ./frontend
+  #   container_name: streamlit_frontend
+  #   ports:
+  #     - "8501:8501"
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - appnet
+
+networks:
+  appnet:

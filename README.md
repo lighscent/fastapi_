@@ -1,5 +1,7 @@
 # FastAPI (Mais en fait: Bases numpy, pandas, matplolib, etc... Pour ML [Machine Learning])
 
+## Démarrer dev sous Docker: tools/racc.bat dev
+
 # Suivre: https://www.delcampe.net/fr/collections/monnaies-billets/monnaies-euro/chypre/zypern-2-euro-munze-2008-kibris-1913666472.html#tab-description
 
 
