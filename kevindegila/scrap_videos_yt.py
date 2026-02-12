@@ -10,7 +10,7 @@ import numpy as np
 from tabulate import tabulate
 
 print("Attention, exit() car écrase des data potentiellement...")
-exit()  # Lancer se script écrasera un fichier peut-être déjà présent. À décommenter seulement si vous savez ce que vous faites.
+# exit()  # Lancer se script écrasera un fichier peut-être déjà présent. À décommenter seulement si vous savez ce que vous faites.
 
 # //2do faire effacer le .json lourd et devenu inutile à la fin du script.
 
@@ -22,11 +22,13 @@ TEST_COUNT = None
 if TEST_COUNT:
     SUFFIX = f"_test{TEST_COUNT}"
 # Définir l'auteur de la chaîne YouTube à analyser
-AUTHOR = "KevinDegila"
+# AUTHOR = "KevinDegila"
 # AUTHOR = "c57-u5s"
 # AUTHOR = "doro2255"
-# AUTHOR = "LionelCOTE"
+AUTHOR = "LionelCOTE"
 # AUTHOR = "MachineLearnia"
+
+AUTHOR = "donaldprogrammeur"
 
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
 CACHE_DIR = "D:/fastapi/kevindegila/cache"
@@ -202,15 +204,6 @@ def analyze_dataset(df):
     print(videos_by_year)
 
 
-# def format_duration(seconds):
-#     """Convertit une durée en secondes en format MM:SS"""
-#     if pd.isna(seconds):
-#         return "N/A"
-#     minutes = int(seconds) // 60
-#     remaining_seconds = int(seconds) % 60
-#     return f"{minutes:02d}:{remaining_seconds:02d}"
-
-
 def format_date(date):
     """Formate une date ou retourne 'N/A' si None"""
     if pd.isna(date) or date is None:
@@ -230,7 +223,7 @@ def format_title(title, max_length=59):
 
 
 def format_duration(seconds):
-    """Convertit une durée en format HH:MM:SS"""
+    """Convertit une durée en secondes en format HH:MM:SS"""
     if pd.isna(seconds):
         return "N/A"
     hours = int(seconds // 3600)

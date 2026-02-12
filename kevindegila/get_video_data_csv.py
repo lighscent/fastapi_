@@ -9,8 +9,10 @@ import flet as ft
 # AUTHOR = "KevinDegila"
 # AUTHOR = "c57-u5s"
 # AUTHOR = "doro2255"
-AUTHOR = "LionelCOTE"
+# AUTHOR = "LionelCOTE"
 # AUTHOR = "MachineLearnia"
+
+AUTHOR = "donaldprogrammeur"
 
 TEST = 0
 
@@ -156,7 +158,7 @@ if __name__ == "__main__":
     pd.set_option("display.expand_frame_repr", False)  # Empêche le retour à la ligne
     display_videos_table(df.head(1))
 
-    exit()
+    # exit()
 
     # Afficher le tableau
     # display_videos_table(df[1:2])

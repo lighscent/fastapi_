@@ -4,8 +4,19 @@
 
 # Suivre: https://www.delcampe.net/fr/collections/monnaies-billets/monnaies-euro/chypre/zypern-2-euro-munze-2008-kibris-1913666472.html#tab-description
 
-
 ## Installation au départ
+
+NB: Utilisert python3.12 max
+Décompresser https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.zip
+dans C:\python312\
+
+```bash
+C:\python312\python.exe -m venv .venv
+.venv\Scripts\python.exe -m pip install --upgrade pip
+pip install fastapi uvicorn scikit-image numpy scipy
+OU
+pip install -r requirements
+```
 
 ```bash
 # Active ton venv (Exemple si ton dossier du projet est dans D:/fastapi/)
@@ -13,6 +24,18 @@
 
 # Installe ton package tools en mode editable
 pip install -e .
+
+Autre exemple
+
+```bash
+-e git+https://github.com/GrCOTE7/fastapi.git@415f927808f86ed702d57d3d2d19761ce88c7a14#egg=tools
+# -e (editable) dit à pip :
+# → “Installe ce package en mode développement dans .venv/src/”
+# git+https://... dit :
+# → “Clone ce dépôt Git pour l’installer”
+# #egg=tools dit :
+# → “Le package s’appelle tools”
+# ➡️ Clone ton dépôt Git dans .venv/src/tools.
 ```
 
 ## FastAPI
@@ -51,13 +74,9 @@ Documentation intégrée	Oui	Non	Non
 Courbe d’apprentissage	Modérée	Facile	Complexe
 Tu veux que je te montre un exemple de code ultra simple avec FastAPI ? Ou tu veux savoir comment l’installer et démarrer un projet ?
 
-
-
-
-
 Modifier dans une page
 commencons par un exemple ultra simple
-Parfait Lionel, voici un exemple minimaliste pour te montrer la magie de FastAPI en action 🚀 :
+Voici un exemple minimaliste pour te montrer la magie de FastAPI en action 🚀 :
 
 🧪 Exemple de base : une API qui dit bonjour
 python
