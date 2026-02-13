@@ -468,3 +468,28 @@ Durée : 2 à 4 jours
 Compression, quantization, distillation
 
 Objectif : tourner sur CPU ou Raspberry Pi si besoin
+
+--- 
+
+## Entretient
+
+## Installation
+
+### 1 Fork [https://github.com/GH_USERNAME/PROJECT](https://github.com/GH_USERNAME/PROJECT)
+
+### 2 En CLI, dans le dossier de ton choix
+
+```bash
+Git clone git@github.com:TON_GH_USERNAME/PROJECT.git
+cd PROJECT
+```
+
+### 3 Renomme .env_exemple en .env et renseigne ton MISTRAL_API_KEY
+
+(Au besoin, génères en une sur [https://console.mistral.ai/codestral/cli?workspace_dialog=apiKeys](https://console.mistral.ai/codestral/cli?workspace_dialog=apiKeys))
+
+### 4 Enjoy ! :-)
+
+```bash
+python tSCRIPT.py
+```
