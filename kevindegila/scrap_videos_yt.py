@@ -22,11 +22,11 @@ TEST_COUNT = None
 if TEST_COUNT:
     SUFFIX = f"_test{TEST_COUNT}"
 # Définir l'auteur de la chaîne YouTube à analyser
-# AUTHOR = "KevinDegila"
-# AUTHOR = "c57-u5s"
-# AUTHOR = "doro2255"
-AUTHOR = "LionelCOTE"
-# AUTHOR = "MachineLearnia"
+# ❌ AUTHOR = "KevinDegila"
+# ❌ AUTHOR = "c57-u5s"
+AUTHOR = "doro2255"
+# AUTHOR = "LionelCOTE"
+# ❌ AUTHOR = "MachineLearnia"
 
 AUTHOR = "donaldprogrammeur"
 
@@ -70,7 +70,7 @@ def fetch_and_save_videos():
         total_videos = len(video_entries)
 
     print(
-        f"{total_videos_global} vidéos trouvées dans la playlist"
+        f"{total_videos_global} vidéo{'s' if total_videos_global>1 else ''} trouvées dans la playlist"
         + (
             f" (Limité à {TEST_COUNT} pour les tests)."
             if TEST_COUNT is not None
@@ -152,7 +152,7 @@ def create_videos_dataset(info):
         views = entry.get("view_count")
         likes = entry.get("like_count")
 
-        like_ratio = (likes / views * 100) if views and views > 0 else 0.0
+        like_ratio = (likes / views * 100) if likes and views and views > 0 else 0.0
 
         video = {
             "title": entry.get("title"),

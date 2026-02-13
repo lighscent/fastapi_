@@ -9,10 +9,10 @@ import flet as ft
 # AUTHOR = "KevinDegila"
 # AUTHOR = "c57-u5s"
 # AUTHOR = "doro2255"
-# AUTHOR = "LionelCOTE"
+AUTHOR = "LionelCOTE"
 # AUTHOR = "MachineLearnia"
 
-AUTHOR = "donaldprogrammeur"
+# AUTHOR = "donaldprogrammeur"
 
 # 2fix Améliorer scrip^t pour sauvegarde progressive permetant reprise si perte de connexion
 
@@ -56,7 +56,7 @@ def format_date(date):
         return "N/A"
 
 
-def format_title(title, max_length=59):
+def format_title(title, max_length=55):
     """Tronque le titre à max_length caractères et ajoute ... si nécessaire"""
     title = str(title or "N/A")
     if len(title) > max_length:
@@ -120,10 +120,18 @@ def display_videos_table(df):
     )
 
     # En-têtes du tableau
-    headers = ["Date", "Titre", "Durée", "Views", "Likes ( % views)", "Commentaires"]
+    headers = [
+        "Date",
+        "Titre",
+        "Durée",
+        "Views",
+        "Likes ( % views)",
+        "Commentaires",
+        "Url",
+    ]
 
     # Afficher le tableau
-    print("\n=== Liste des vidéos de Kevin Degila ===")
+    print(f"\n=== Liste des vidéos de {AUTHOR} ===")
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
 
@@ -166,8 +174,8 @@ if __name__ == "__main__":
     # display_videos_table(df[1:2])
     display_videos_table(df)
 
-    exit()
-    print(df)
+    # print(df)
+    exit()  # Affiche les graphs
 
     import pandas as pd
     import matplotlib.pyplot as plt
