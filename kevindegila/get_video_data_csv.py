@@ -14,6 +14,8 @@ import flet as ft
 
 AUTHOR = "donaldprogrammeur"
 
+# 2fix Améliorer scrip^t pour sauvegarde progressive permetant reprise si perte de connexion
+
 TEST = 0
 
 SUFFIX = f"_test{TEST}" if TEST else ""
