@@ -1,3 +1,12 @@
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&duration=2000&pause=400&color=6366F1&center=true&vCenter=true&multiline=true&repeat=false&width=600&height=100&lines=Hey+%F0%9F%91%8B+I'm+GrCOTE7;Just+A+French+Dev+%F0%9F%9A%80)](https://github.com/GrCOTE7)
+
+<img src="https://komarev.com/ghpvc/?username=GrCOTE7&style=for-the-badge&color=6366F1&label=VISITORS" alt="Profile Views"/>
+
+
+[![GitHub followers](https://img.shields.io/github/followers/Tarkhubal?style=for-the-badge&logo=github&color=6366F1)](https://github.com/Tarkhubal?tab=followers)
+[![Website](https://img.shields.io/badge/Exaload-exaload.app-6366F1?style=for-the-badge&logo=safari)](https://exaload.app)
+[![Instagram](https://img.shields.io/badge/Instagram-un__thomas__sauvage-E4405F?style=for-the-badge&logo=instagram)](https://www.instagram.com/un_thomas_sauvage/)
+
 # FastAPI (Mais en fait: Bases numpy, pandas, matplolib, etc... Pour ML [Machine Learning])
 
 ## Démarrer dev sous Docker: tools/racc.bat dev

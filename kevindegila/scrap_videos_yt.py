@@ -10,7 +10,7 @@ import numpy as np
 from tabulate import tabulate
 
 print("Attention, exit() car écrase des data potentiellement...")
-# exit()  # Lancer se script écrasera un fichier peut-être déjà présent. À décommenter seulement si vous savez ce que vous faites.
+exit()  # Lancer se script écrasera un fichier peut-être déjà présent. À décommenter seulement si vous savez ce que vous faites.
 
 # //2do faire effacer le .json lourd et devenu inutile à la fin du script.
 
@@ -18,9 +18,9 @@ SUFFIX = ""
 # Mettre un nombre pour limiter le nombre de vidéos pour les tests, sinon None
 TEST_COUNT = None
 
-
 if TEST_COUNT:
     SUFFIX = f"_test{TEST_COUNT}"
+    
 # Définir l'auteur de la chaîne YouTube à analyser
 # ❌ AUTHOR = "KevinDegila"
 # ❌ AUTHOR = "c57-u5s"
@@ -28,7 +28,7 @@ AUTHOR = "doro2255"
 # AUTHOR = "LionelCOTE"
 # ❌ AUTHOR = "MachineLearnia"
 
-AUTHOR = "donaldprogrammeur"
+# AUTHOR = "donaldprogrammeur"
 
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
 CACHE_DIR = "D:/fastapi/kevindegila/cache"

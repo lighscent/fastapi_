@@ -9,12 +9,12 @@ import flet as ft
 # AUTHOR = "KevinDegila"
 # AUTHOR = "c57-u5s"
 # AUTHOR = "doro2255"
-AUTHOR = "LionelCOTE"
+# AUTHOR = "LionelCOTE"
 # AUTHOR = "MachineLearnia"
 
-# AUTHOR = "donaldprogrammeur"
+AUTHOR = "donaldprogrammeur"
 
-# 2fix Améliorer scrip^t pour sauvegarde progressive permetant reprise si perte de connexion
+# 2fix Améliorer script pour sauvegarde progressive permettant reprise sans perte si perte de connexion
 
 TEST = 0
 
@@ -115,7 +115,7 @@ def display_videos_table(df):
             views,
             f"{likes} ({ratio:.1f}" + " %)",
             df["comment_count"].sum(),
-            "xxx",
+            "---",
         ]
     )
 
@@ -132,7 +132,14 @@ def display_videos_table(df):
 
     # Afficher le tableau
     print(f"\n=== Liste des vidéos de {AUTHOR} ===")
-    print(tabulate(table_data, headers=headers, tablefmt="grid"))
+    print(
+        tabulate(
+            table_data,
+            headers=headers,
+            tablefmt="grid",
+            maxcolwidths=[15, 55, 10, 10, 20, 15, 30],
+        )
+    )
 
 
 # Charger ou créer le dataset
@@ -173,9 +180,10 @@ if __name__ == "__main__":
     # Afficher le tableau
     # display_videos_table(df[1:2])
     display_videos_table(df)
+    print(f"Fin de la liste des vidéos de \033[1m{AUTHOR}\033[0m")
 
     # print(df)
-    exit()  # Affiche les graphs
+    # exit()  # Affiche les graphs
 
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -187,19 +195,20 @@ if __name__ == "__main__":
     df["duration_minutes"] = df["duration"] / 60
 
     # 3. Tracer la courbe
-    plt.figure(figsize=(8, 15))
+    plt.figure(figsize=(15, 8))
     plt.plot(df["upload_date"], df["duration"], marker="o")
     plt.xlabel("Date de publication")
     plt.ylabel("Durée (minutes)")
-    plt.title("Durée des vidéos publiées au fil du temps")
+    plt.title(f"Durée des vidéos de $\\bf{{{AUTHOR}}}$ publiées au fil du temps")
     plt.grid(True)
     plt.show()
-
     # Regroupe par semaine et sommer les minutes
     weekly_prod = df.resample("W", on="upload_date")["duration"].sum()
 
     plt.figure(figsize=(10, 5))
     plt.plot(weekly_prod.index, weekly_prod.values, marker="o")
+
+    exit()  # Affiche les autres graphs
 
     # Légendes plus explicites
     plt.xlabel("Date (par semaine)")  # Axe des x
