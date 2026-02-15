@@ -480,25 +480,45 @@ Objectif : tourner sur CPU ou Raspberry Pi si besoin
 
 --- 
 
+
 ## Entretient
 
 ## Installation
 
-### 1 Fork [https://github.com/GH_USERNAME/PROJECT](https://github.com/GH_USERNAME/PROJECT)
+### 1 Fork [https://github.com/gricatan/PROJECT](https://github.com/gricatan/PROJECT) → Dans GH, avec *TON_USER_COMPTE*
 
 ### 2 En CLI, dans le dossier de ton choix
 
 ```bash
-Git clone git@github.com:TON_GH_USERNAME/PROJECT.git
+Git clone git@github.com:TON_USER-COMPTE/PROJECT.git
 cd PROJECT
 ```
 
-### 3 Renomme .env_exemple en .env et renseigne ton MISTRAL_API_KEY
+### 3 Dans ton .venv : Utiliser python3.12 max & y installer les libs
+
+Exemple pour Win (Adapter si autre OS) :
+
+1. Décompresser https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.zip
+dans C:\python312\
+
+2. Fais ton virtual environment (.VEnv) avec ce 'vieux' Python
+
+    ```bash
+    C:\python312\python.exe -m venv .venv
+
+    .venv\Scripts\python.exe -m pip install --upgrade pip
+
+    pip install -r requirements
+    ```
+    
+
+
+### 4 Renomme .env_exemple en .env et renseignes y ton MISTRAL_API_KEY
 
 (Au besoin, génères en une sur [https://console.mistral.ai/codestral/cli?workspace_dialog=apiKeys](https://console.mistral.ai/codestral/cli?workspace_dialog=apiKeys))
 
-### 4 Enjoy ! :-)
+## Enjoy ! 😊
 
 ```bash
-python tSCRIPT.py
+python TheSCRIPT.py
 ```
