@@ -3,7 +3,6 @@ from PIL import Image, ImageDraw, ImageFont
 from typing import cast
 
 text = "PyMox.fr".upper()
-# //2do Py bleu - Mox blanc - .fr rouge pour Pymox.fr
 # text = "Cote7.com"
 # font = ImageFont.truetype("arial.ttf", 40)
 font_path = os.path.join(os.path.dirname(__file__), "BlockShadow-Bold.ttf")

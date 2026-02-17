@@ -2,7 +2,6 @@ from PIL import Image, ImageDraw, ImageFont
 from typing import cast
 
 text = "PyMox.fr"
-# ❌ Py bleu Mox blanc .fr rouge pour Pymox.fr
 # text = "Cote7.com"
 # font = ImageFont.truetype("arial.ttf", 40)
 font = ImageFont.truetype("arial.ttf", 40)
