@@ -4,7 +4,6 @@ from typing import cast
 
 # Texte complet
 text = "PyMox.fr".upper()
-# text = "PyMox.fr"
 
 # Segments et couleurs ANSI + RGB
 BLUE = "\033[34;1m"
@@ -13,9 +12,14 @@ RED = "\033[31;1m"
 RESET = "\033[0m"
 
 segments = [
-    ("PY", BLUE, (0, 120, 255)),
-    ("MOX.", WHITE, (255, 255, 255)),
-    ("FR", RED, (255, 0, 0)),
+    ("P", BLUE, (0, 120, 255)),
+    ("Y", BLUE, (0, 120, 255)),
+    ("M", WHITE, (255, 255, 255)),
+    ("O", WHITE, (255, 255, 255)),
+    ("X", WHITE, (255, 255, 255)),
+    (".", WHITE, (255, 255, 255)),
+    ("F", RED, (255, 0, 0)),
+    ("R", RED, (255, 0, 0)),
 ]
 
 # Police BlockShadow
@@ -58,13 +62,14 @@ for y in range(img.height):
         pixel = cast(int, img.getpixel((x, y)))
 
         # Trouver la couleur correspondant à la zone
-        for (start, end), (_, ansi, _) in zip(zones, segments):
+        for (start, end), (seg_text, ansi, _) in zip(zones, segments):
             if start <= x < end:
                 color = ansi
+                ascii_char = "#" if seg_text in ("P", "M", "X") else "7"
                 break
 
         if pixel > 128:
-            line += f"{color}7{RESET}"
+            line += f"{color}{ascii_char}{RESET}"
         else:
             line += " "
     print(line)
@@ -81,15 +86,16 @@ for y in range(img.height):
     for x in range(img.width):
         pixel = img.getpixel((x, y))
 
-        # Trouver la couleur RGB correspondant à la zone
-        for (start, end), (_, _, rgb) in zip(zones, segments):
+        # Trouver la couleur RGB + caractère ASCII
+        for (start, end), (seg_text, _, rgb) in zip(zones, segments):
             if start <= x < end:
                 color_rgb = rgb
+                ascii_char = "#" if seg_text in ("P", "M", "X") else "7"
                 break
 
         if pixel > 128:
             draw_out.text(
-                (x * cell_w, y * cell_h), "7", fill=color_rgb, font=ascii_font
+                (x * cell_w, y * cell_h), ascii_char, fill=color_rgb, font=ascii_font
             )
 
 # --- ÉTAPE 1 : RENDRE LES PIXELS OPAQUES ---
@@ -105,7 +111,6 @@ for y in range(out.height):
     for x in range(out.width):
         r, g, b, a = pixels[x, y]
         if a > 0:
-            # Trouver la zone horizontale
             for (start, end), (_, _, rgb) in zip(zones, segments):
                 if start * cell_w <= x < end * cell_w:
                     pixels[x, y] = (rgb[0], rgb[1], rgb[2], 255)
@@ -127,4 +132,3 @@ final.paste(out, (offset_x, offset_y), out)
 
 # Sauvegarde PNG
 final.save("pymox_shadow.png")
-# print("PNG généré : pymox_shadow.png (couleurs pures + fond transparent)")
