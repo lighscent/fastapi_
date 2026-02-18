@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 from typing import Any, cast
 
 # Texte complet
-text = "PyMox.fr".upper()
+text = "PyMoX.fr".upper()
 
 # Segments et couleurs ANSI + RGB
 BLUE = "\033[34;1m"
@@ -28,22 +28,29 @@ font_path = os.path.join(os.path.dirname(__file__), "BlockShadow-Bold.ttf")
 font = ImageFont.truetype(font_path, 40)
 
 # 1. Rendre le texte dans une image
-img = Image.new("L", (600, 150), color=0)
+img = Image.new("L", (1200, 300), color=0)
 draw = ImageDraw.Draw(img)
-draw.text((10, 10), text, fill=255, font=font)
+draw.text((20, 20), text, fill=255, font=font)
 
 # 2. Rogner automatiquement autour du texte
-bbox = img.getbbox()
-img = img.crop(bbox)
+img = img.crop(img.getbbox())
 
 # 3. Redimensionner pour lisibilité
-img = img.resize((190, 13))
+# img = img.resize((190, 13))
+target_width = 380
+scale = target_width / img.width
+img = img.resize((target_width, int(img.height * scale)))
 
 # --- Calcul des zones horizontales ---
 widths = []
 for seg, _, _ in segments:
     b = font.getbbox(seg)
     w = b[2] - b[0]
+
+    # Réduction de largeur pour les petites lettres
+    # if seg not in ("P", "M", "X"):
+    #     w = int(w * 0.6)
+
     widths.append(w)
 
 total_width = sum(widths)
@@ -80,8 +87,11 @@ print()
 ascii_font = ImageFont.load_default()
 cell_w, cell_h = 8, 12
 
+SMALL_SCALE = 0.6  # Pour les petites majuscules
+
 out = Image.new("RGBA", (img.width * cell_w, img.height * cell_h), (0, 0, 0, 0))
 draw_out = ImageDraw.Draw(out)
+# pixel = cast(int, img.getpixel((x, y)))
 
 for y in range(img.height):
     for x in range(img.width):
