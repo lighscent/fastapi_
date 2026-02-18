@@ -1,0 +1,80 @@
+Date: 18/2/2026
+Time: 10:58
+Phone Number: +33783592721
+Message: Hello from pywhatkit!
+--------------------
+Date: 18/2/2026
+Time: 11:16
+Phone Number: +33783592721
+Message: Hello 2 from pywhatkit!
+--------------------
+Date: 18/2/2026
+Time: 11:20
+Phone Number: +33783592721
+Message: Hello world from pywhatkit!
+--------------------
+Date: 18/2/2026
+Time: 11:29
+Phone Number: +33783592721
+Message: Hello world AUTO from pywhatkit!
+--------------------
+Date: 18/2/2026
+Time: 11:32
+Phone Number: +33783592721
+Message: Hello world AUTO 2 from pywhatkit!
+--------------------
+Date: 18/2/2026
+Time: 11:42
+Phone Number: +33783592721
+Message: 3 Hello world AUTO from pywhatkit!
+--------------------
+Date: 18/2/2026
+Time: 11:48
+Phone Number: +33783592721
+Message: 4 Hello world AUTO from pywhatkit!
+--------------------
+Date: 18/2/2026
+Time: 11:54
+Phone Number: +33617820927
+Message: Exemple d'un message programmé pour être envoyé via WhatsApp à une heure précise. Ce message est envoyé automatiquement grâce à la bibliothèque pywhatkit en Python. C'est un moyen pratique d'automatiser l'envoi de messages sur WhatsApp, que ce soit pour des rappels, des notifications ou simplement pour dire bonjour à quelqu'un à un moment spécifique. N'oubliez pas de configurer correctement les coordonnées de clic et les numéros de téléphone dans votre environnement pour que cela fonctionne correctement.
+--------------------
+Date: 18/2/2026
+Time: 12:3
+Phone Number: +33768452904
+Message: Salut, Thierry... Alors, comment vas :-) ?
+--------------------
+Date: 18/2/2026
+Time: 12:8
+Phone Number: +33783592721
+Message: Kikoo... À la tienne !
+--------------------
+Date: 18/2/2026
+Time: 12:10
+Phone Number: +33617820927
+Message: Kikoo... À la tienne !
+--------------------
+Date: 18/2/2026
+Time: 12:30
+Phone Number: +33783592721
+Message: Kikoo... À la tienne !
+--------------------
+Date: 18/2/2026
+Time: 12:34
+Phone Number: +33783592721
+Message: Kikoo... À la tienne !
+--------------------
+Date: 18/2/2026
+Time: 13:32
+Phone Number: +33783592721
+Message: 22 - Kikoo... À la tienne !
+--------------------
+Date: 18/2/2026
+Time: 13:34
+Phone Number: +33783592721
+Message: 22 - Kikoo... À la tienne !
+--------------------
+Date: 18/2/2026
+Time: 13:37
+Phone Number: +33783592721
+Message: Kikoo... À bonne la tienne !
+--------------------
