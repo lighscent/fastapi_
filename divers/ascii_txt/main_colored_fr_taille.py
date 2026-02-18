@@ -1,6 +1,7 @@
+from codecs import ignore_errors
 import os
 from PIL import Image, ImageDraw, ImageFont
-from typing import cast
+from typing import Any, cast
 
 # Texte complet
 text = "PyMox.fr".upper()
@@ -84,7 +85,8 @@ draw_out = ImageDraw.Draw(out)
 
 for y in range(img.height):
     for x in range(img.width):
-        pixel = img.getpixel((x, y))
+        # pixel = img.getpixel((x, y))
+        pixel = cast(int, img.getpixel((x, y)))
 
         # Trouver la couleur RGB + caractère ASCII
         for (start, end), (seg_text, _, rgb) in zip(zones, segments):
@@ -99,7 +101,7 @@ for y in range(img.height):
             )
 
 # --- ÉTAPE 1 : RENDRE LES PIXELS OPAQUES ---
-pixels = out.load()
+pixels = cast(Any, out.load())
 for y in range(out.height):
     for x in range(out.width):
         r, g, b, a = pixels[x, y]
