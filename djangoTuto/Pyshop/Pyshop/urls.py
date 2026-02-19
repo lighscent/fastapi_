@@ -16,8 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+# from .views import animated_favicon, favicon, robots_txt
+from .views import animated_favicon, favicon, robots_txt
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("products.urls")),
+    path("animated_favicon.gif", animated_favicon),
+    path("favicon.ico", favicon),
+    path("robots.txt", robots_txt),
 ]

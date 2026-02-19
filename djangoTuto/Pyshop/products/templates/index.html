@@ -1,22 +1,30 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} 
+  {% load static %}
+  
+  {% block h2 %}  
+  
+  <p class="text-center">General listing</p>
+  
+  {% endblock %} {% block content %}
 
-{% block content %}
-
-<div class="container">
+  <div class="container">
     <div class="row">
-        {% for product in produits %}
-         <div class="col">
-            <div class="card" style="width: 18rem;">
-                <img src="{% static 'images/img10.jpeg' %}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text">{{ product.price }} fcfa</p>
-                    <a href="#" class="btn btn-primary">Add to card</a>
-                </div>
-            </div>
+      {% for product in produits %}
+      <div class="col">
+        <div class="card" style="width: 18rem">
+          <img
+            src="{% static product.image_url %}"
+            class="card-img-top"
+            alt="{{ product.name|lower|capfirst }} photo"
+          />
+          <div class="card-body">
+            <h5 class="card-title">{{ product.name|lower|capfirst }}</h5>
+            <p class="card-text">$ {{ product.price|floatformat:2 }}</p>
+            <a href="#" class="btn btn-primary">Add to cart</a>
+          </div>
         </div>
-    {% endfor %}
+      </div>
+      {% endfor %}
     </div>
-</div>
+  </div>
 {% endblock %}
