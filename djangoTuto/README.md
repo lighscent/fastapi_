@@ -20,3 +20,9 @@ py manage.py runserver
 → [http://localhost:8000/admin](http://localhost:8000/admin)
 
 → [http://localhost:8000](http://localhost:8000)
+
+py -m django --version
+
+python -VV
+
+pip -V
