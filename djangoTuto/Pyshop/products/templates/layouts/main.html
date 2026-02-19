@@ -10,37 +10,14 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
   </head>
   <body>
-    <nav class="navbar navbar-dark bg-dark mb-3">
-      <a class="navbar-brand font-weight-bold" href="{% url 'index' %}"
-        >Pyshop</a
-      >
-
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#mainNavbar"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="mainNavbar">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'about' %}">About</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-
+    
+    {% include "partials/navbar.html" %}
+    
     <div class="bg-warning pb-2">
       <marquee class="display-4 text-capitalize font-italic pb-1 mx-3">
         welcome to our fruit's webSite build with django-python
       </marquee>
       <h1 class="ml-3">Pyshop {{ slogan }}</h1>
-      {% comment %}
-      <h3 class="text-info">Products</h3>
-      {% endcomment %}
     </div>
 
     <h2>{% block h2%}{% endblock %}</h2>
