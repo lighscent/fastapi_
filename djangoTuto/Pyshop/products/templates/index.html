@@ -1,12 +1,14 @@
-{% extends 'base.html' %} 
-  {% load static %}
-  
-  {% block h2 %}  
-  
-  <p class="text-center">General listing</p>
-  
-  {% endblock %} {% block content %}
+{% extends 'base.html' %}
 
+{% load static %}
+
+{% block h2 %}  
+
+<p class="text-center">General listing</p>
+
+{% endblock %}
+
+{% block content %}
   <div class="container">
     <div class="row">
       {% for product in produits %}

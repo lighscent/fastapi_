@@ -30,3 +30,39 @@ b {
 #progress {
   background: linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .5)), url(../img/about.jpg)center/cover no-repeat fixed;
 }
+
+/* < 505px : comportement Bootstrap normal */
+@media (max-width: 504px) {
+  /* rien à faire */
+}
+  
+/* ≥ 505px : menu horizontal à côté du brand */
+@media (min-width: 505px) {
+
+  /* cacher le hamburger */
+  .navbar-toggler {
+    display: none;
+  }
+
+  /* forcer le menu à se comporter comme un élément inline-flex */
+  .navbar-collapse {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: auto !important;
+    flex-grow: 0 !important;
+    /* empêche d'occuper toute la largeur */
+    flex-basis: auto !important;
+    /* empêche de passer à la ligne */
+  }
+
+  /* items du menu en ligne */
+  .navbar-nav {
+    flex-direction: row !important;
+  }
+
+  /* espacement horizontal entre les liens */
+  .nav-item {
+    margin-left: 1rem;
+  }
+}
