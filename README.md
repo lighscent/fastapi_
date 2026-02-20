@@ -2,6 +2,12 @@
 
 <img src="https://komarev.com/ghpvc/?username=GrCOTE7&style=for-the-badge&color=6366F1&label=VISITORS" alt="Profile Views"/>
 
+graph TD
+    root --> app
+    app --> models
+    app --> views
+    app --> templates
+
 
 [![GitHub followers](https://img.shields.io/github/followers/Tarkhubal?style=for-the-badge&logo=github&color=6366F1)](https://github.com/Tarkhubal?tab=followers)
 [![Website](https://img.shields.io/badge/Exaload-exaload.app-6366F1?style=for-the-badge&logo=safari)](https://exaload.app)

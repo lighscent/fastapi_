@@ -1,0 +1,116 @@
+├── bandecodeur
+│   └── data
+├── chrome-data
+│   └── Default
+├── datasets
+├── divers
+│   ├── ascii_txt
+│   ├── bases
+│   ├── mistralai
+│   └── whatsApp
+├── djangoTuto
+│   └── Pyshop
+│       ├── Pyshop
+│       └── products
+│           ├── migrations
+│           ├── static
+│           │   ├── css
+│           │   ├── images
+│           │   └── js
+│           └── templates
+│               ├── layouts
+│               └── partials
+├── handson-ml3
+│   ├── docker
+│   │   └── bin
+│   └── images
+│       ├── ann
+│       ├── classification
+│       ├── cnn
+│       ├── decision_trees
+│       ├── deep
+│       ├── deploy
+│       ├── end_to_end_project
+│       ├── ensembles
+│       ├── fundamentals
+│       ├── generative
+│       ├── nlp
+│       ├── rl
+│       ├── rnn
+│       ├── tensorflow
+│       ├── training_linear_models
+│       └── unsupervised_learning
+├── ia
+│   ├── mistral
+│   └── perplexity
+├── jordy
+│   └── templates
+├── kevindegila
+│   ├── 0_BasePy
+│   │   └── datasets
+│   ├── 1_DataAnalyst
+│   │   ├── datasets
+│   │   │   └── sales
+│   │   └── subs
+│   ├── 2_DeepLearning_160
+│   │   ├── CNN_Streamlit_APP
+│   │   ├── fashion_mnist
+│   │   │   └── libs
+│   │   └── waste
+│   │       └── essais_ggle_drive_api
+│   ├── cache
+│   ├── images
+│   ├── poubelleIntelligente_docker
+│   │   ├── backend
+│   │   └── frontend
+│   ├── poubelleIntelligente_gcloud
+│   └── poubelleIntelligente_local
+├── machinelearnia
+│   └── Python-Machine-Learning-master
+│       └── Dataset
+├── mojo
+├── pyproject_template
+│   ├── backend
+│   │   ├── __init__.py
+│   │   ├── app
+│   │   │   ├── __init__.py
+│   │   │   ├── api
+│   │   │   │   └── routes
+│   │   │   ├── core
+│   │   │   ├── schemas
+│   │   │   └── services
+│   │   └── django
+│   │       ├── apps
+│   │       │   └── auth_api
+│   │       ├── config
+│   │       ├── scripts
+│   │       ├── templates
+│   │       │   └── admin
+│   │       └── tests
+│   ├── deploy
+│   │   ├── cryptogeeks
+│   │   │   └── frontend
+│   │   │       └── src
+│   │   └── proxy
+│   ├── frontend
+│   │   ├── e2e
+│   │   ├── playwright-report
+│   │   ├── public
+│   │   │   └── monitoring-screenshots
+│   │   ├── src
+│   │   │   ├── __tests__
+│   │   │   ├── assets
+│   │   │   ├── components
+│   │   │   ├── context
+│   │   │   ├── pages
+│   │   │   └── utils
+│   │   └── test-results
+│   ├── tests
+│   │   ├── django
+│   │   └── fastapi
+│   ├── z_div
+│   └── z_doc
+├── python
+├── simple
+├── tools
+└── tools.egg-info
