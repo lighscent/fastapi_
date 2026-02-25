@@ -23,8 +23,7 @@
     
     (port_local:port_docker)
 
-// 2do
-une structure complète dev/prod
+// 2do une structure complète dev/prod
 
 .env :
 Windows PowerShell

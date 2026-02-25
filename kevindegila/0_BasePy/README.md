@@ -34,7 +34,7 @@ ex. "yann lecun" site:twitter.com -boredyannlecun "deep learning"
 * [ ] [Principe de ML simplement - 3 vidéos](https://www.notion.so/27f2329f2b678016be36c0eaa0402efb)
 
 * [ ] [Série de 160](https://www.youtube.com/watch?v=wncDzOBcaiY&list=PL049bGjkT7dIARLPrxvA4-tbEcg6k0UDX)
-* [ ] 
+
 * [ ] [Des maths y compris réseaux de neurones :À voir toutes !](https://www.youtube.com/@3blue1brown/videos)
 
 ### Références

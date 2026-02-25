@@ -8,7 +8,6 @@ graph TD
     app --> views
     app --> templates
 
-
 [![GitHub followers](https://img.shields.io/github/followers/Tarkhubal?style=for-the-badge&logo=github&color=6366F1)](https://github.com/Tarkhubal?tab=followers)
 [![Website](https://img.shields.io/badge/Exaload-exaload.app-6366F1?style=for-the-badge&logo=safari)](https://exaload.app)
 [![Instagram](https://img.shields.io/badge/Instagram-un__thomas__sauvage-E4405F?style=for-the-badge&logo=instagram)](https://www.instagram.com/un_thomas_sauvage/)
