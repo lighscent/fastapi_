@@ -1,3 +1,6 @@
+
+from tools import *
+
 class A:
 
     def __init__(self):
@@ -26,7 +29,9 @@ b = B()
 # for c in classes:
 #     print(c.__class__.__name__, "est de la classe ", c.__class__.__name__)
 
-print("-" * 55)
+sl()
+
+# print("-" * 55)
 
 # for c in classes:
 #     for i in classes:

@@ -1,4 +1,3 @@
-import flet
 from tools import *
 
 
@@ -143,7 +142,8 @@ def metho_overriding_example():
 
 
 if __name__ == "__main__":
-    w = 55
+    w = 75
+    
     cls()
 
     # DUCK TYPING

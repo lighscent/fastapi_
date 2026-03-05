@@ -11,9 +11,9 @@ RESET = "\033[0m"
 
 # Texte et groupes de couleurs
 color_groups = [
-    ("Kit", BLUE, (0, 120, 255)),
+    ("PyMoX", BLUE, (0, 120, 255)),
     ("-", WHITE, (255, 255, 255)),
-    ("Test", RED, (255, 0, 0)),
+    ("Kit", RED, (255, 0, 0)),
 ]
 
 # Générer le texte et les segments à partir des groupes de couleurs
@@ -177,4 +177,4 @@ final.paste(out, (offset_x, offset_y), out)
 
 # Sauvegarde PNG pour GH transparent BG
 # final.save("pymox_shadow.png", format="PNG")
-final.save("Kit_Test_Logo.png", format="PNG")
+final.save(text + "_Logo.png", format="PNG") # Nom dynamique du fichier
