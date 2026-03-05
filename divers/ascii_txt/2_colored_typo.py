@@ -49,7 +49,7 @@ try:
 except AttributeError:
     resample_mode = getattr(Image, "NEAREST")
 
-img = img.resize((200, 19), resample_mode)
+img = img.resize((200, 15), resample_mode) # 200, 19
 
 # img = img.point(lambda p: 255 if p > 128 else 0)
 
@@ -118,7 +118,7 @@ print()
 
 # --- GÉNÉRATION PNG IDENTIQUE AU RENDU ASCII ---
 ascii_font = ImageFont.load_default()
-cell_w, cell_h = 8, 13
+cell_w, cell_h = 8, 13 # 8, 13
 
 out = Image.new("RGBA", (img.width * cell_w, img.height * cell_h), (0, 0, 0, 0))
 draw_out = ImageDraw.Draw(out)
