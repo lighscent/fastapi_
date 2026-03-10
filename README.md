@@ -2,15 +2,16 @@
 
 <img src="https://komarev.com/ghpvc/?username=GrCOTE7&style=for-the-badge&color=6366F1&label=VISITORS" alt="Profile Views"/>
 
+```mermaid
 graph TD
     root --> app
     app --> models
     app --> views
     app --> templates
-
-[![GitHub followers](https://img.shields.io/github/followers/Tarkhubal?style=for-the-badge&logo=github&color=6366F1)](https://github.com/Tarkhubal?tab=followers)
+```
+<!-- [![GitHub followers](https://img.shields.io/github/followers/Tarkhubal?style=for-the-badge&logo=github&color=6366F1)](https://github.com/Tarkhubal?tab=followers)
 [![Website](https://img.shields.io/badge/Exaload-exaload.app-6366F1?style=for-the-badge&logo=safari)](https://exaload.app)
-[![Instagram](https://img.shields.io/badge/Instagram-un__thomas__sauvage-E4405F?style=for-the-badge&logo=instagram)](https://www.instagram.com/un_thomas_sauvage/)
+[![Instagram](https://img.shields.io/badge/Instagram-un__thomas__sauvage-E4405F?style=for-the-badge&logo=instagram)](https://www.instagram.com/un_thomas_sauvage/) -->
 
 # FastAPI (Mais en fait: Bases numpy, pandas, matplolib, etc... Pour ML [Machine Learning])
 

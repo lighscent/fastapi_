@@ -146,14 +146,18 @@ function Activate-Venv {
   # est chargé automatiquement par Python au démarrage
   # Il configure le sys.path pour tous les scripts, même lancés via Flet
 
-  import sys
-  from pathlib import Path
 
-  # Chemin vers la racine de ton projet
-  ROOT = Path(r"D:\c2\fastapi")
+  # --- Copie automatique de sitecustomize.py ---
+  $Source = "tools\sitecustomize.py"
+  $Target = ".venv\Lib\site-packages\sitecustomize.py"
 
-  if str(ROOT) not in sys.path:
-      sys.path.insert(0, str(ROOT))
+  if (Test-Path $Source) {
+    Copy-Item $Source $Target -Force
+    Write-Host "sitecustomize.py copié dans le venv."
+  }
+  else {
+    Write-Host "[AVERTISSEMENT] tools\sitecustomize.py introuvable."
+  }
 
 }
 

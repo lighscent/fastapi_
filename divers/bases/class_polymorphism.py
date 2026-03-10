@@ -142,7 +142,7 @@ def metho_overriding_example():
 
 
 if __name__ == "__main__":
-    w = 75
+    w = 53
     
     cls()
 
