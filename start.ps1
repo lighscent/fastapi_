@@ -127,8 +127,8 @@ function Ensure-Venv {
   Write-Host "Création de l'environnement virtuel ← racine..."
   # py -3.11 -m venv .venv
   # py -3.12 -m venv .venv
-  py -3.13 -m venv .venv
-  # py -m venv .venv
+  # py -3.13 -m venv .venv
+  py -m venv .venv
   if (-not (Test-Path $VenvPath)) {
     Write-Host "[ERREUR] Échec de création de l'environnement virtuel."
     exit 1
@@ -147,17 +147,17 @@ function Activate-Venv {
   # Il configure le sys.path pour tous les scripts, même lancés via Flet
 
 
-  # --- Copie automatique de sitecustomize.py ---
-  $Source = "tools\sitecustomize.py"
-  $Target = ".venv\Lib\site-packages\sitecustomize.py"
+  # --- Copie automatique de sitecustomize.py ( Juste for fastapi/ ) ---
+  # $Source = "tools\sitecustomize.py"
+  # $Target = ".venv\Lib\site-packages\sitecustomize.py"
 
-  if (Test-Path $Source) {
-    Copy-Item $Source $Target -Force
-    Write-Host "sitecustomize.py copié dans le venv."
-  }
-  else {
-    Write-Host "[AVERTISSEMENT] tools\sitecustomize.py introuvable."
-  }
+  # if (Test-Path $Source) {
+  #   Copy-Item $Source $Target -Force
+  #   Write-Host "sitecustomize.py copié dans le venv."
+  # }
+  # else {
+  #   Write-Host "[AVERTISSEMENT] tools\sitecustomize.py introuvable."
+  # }
 
 }
 
@@ -172,11 +172,21 @@ function Upgrade-Pip {
 
 function Install-Requirements {
   Write-Host "Installation des dépendances..."
-  pip install -r requirements.txt
+
+  if (Test-Path "requirements.txt") {
+    Write-Host "requirements.txt détecté, installation via ce fichier..."
+    pip install -r requirements.txt
+  }
+  else {
+    Write-Host "requirements.txt absent, installation de pymox_kit.uniquement..."
+    pip install pymox_kit
+  }
+
   if ($LASTEXITCODE -ne 0) {
     Write-Host "[ERREUR] ❌ Installation échouée"
     exit 1
   }
+
   Write-Host "[OK] ✅ Dépendances installées"
 }
 
@@ -197,7 +207,10 @@ function Start-App {
   Write-Host ""
   Write-Host "Démarrage automatique du script ./main.py... 🚀"
   Write-Host ""
-  flet run -d -r --ignore-dirs __pycache__ main.py
+  # Flet CLI supports --ignore-dirs (no --ignore-files in this version).
+  # Prevent writing .pyc files during run to mimic "**/*.pyc" ignore behavior.
+  $env:PYTHONDONTWRITEBYTECODE = "1"
+  flet run -d -r --ignore-dirs ".git,.venv,__pycache__" main.py
 }
 
 # --- Aide ---

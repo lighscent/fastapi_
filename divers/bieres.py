@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from tools import *
+from pymox_kit import *
 
 # Prix des bières
 p1 = 0.85
@@ -13,21 +13,19 @@ x = np.linspace(0, 20, 200)
 bieres_p1 = x / p1
 bieres_p2 = x / p2
 
-w = 57
+w = CLIW
 cls()
 
 print(f"Rapport : {p2 / p1:.2f} bières à {p1} € = 1 bière à {p2} €")
 
-sl(w)
-print(123)
-sl(w)
+end()
 
 # --- Création des deux graphes côte à côte ---
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 # 1) Graphe de gauche : Budget → Nombre de bières
-axes[0].plot(x, bieres_p1, label="Bières à 0.85 €")
-axes[0].plot(x, bieres_p2, label="Bières à 1.20 €")
+axes[0].plot(x, bieres_p1, label="Bières à 0.85 € / u.")
+axes[0].plot(x, bieres_p2, label="Bières à 1.20 € / u.")
 
 ratio = p2 / p1
 axes[0].axhline(
@@ -57,4 +55,5 @@ axes[1].grid(True)
 axes[1].legend()
 
 plt.tight_layout()
-plt.show()
+# plt.show()
+
