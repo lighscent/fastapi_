@@ -1,16 +1,7 @@
 from datetime import datetime
-from sqlalchemy import null
-import yt_dlp
-import json
-import locale
-import os
-import time
-import random
-from typing import TYPE_CHECKING, TypedDict, cast
+import json, locale, os, time, yt_dlp
 import pandas as pd
-import numpy as np
-from tabulate import tabulate
-
+from typing import TYPE_CHECKING, TypedDict, cast
 from pymox_kit import *
 
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
@@ -37,8 +28,8 @@ SUFFIX = ""
 # AUTHOR = "donaldprogrammeur"
 
 AUTHOR = "InformatiqueSansComplexe"
-AUTHOR = "doro2255"
 AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos
+AUTHOR = "doro2255"
 
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
 # CACHE_DIR = "D:/fastapi/kevindegila/cache"
@@ -46,7 +37,7 @@ url = f"https://www.youtube.com/@{AUTHOR}/videos"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(SCRIPT_DIR, f"cache/.{AUTHOR}_videos.json")
-CACHE_TTL = 3600  # 86400 (1 heure) //2ar
+CACHE_TTL = 3600  # 3600 (1 heure) 86400 (1 jour) //2ar 1 jour à la fin
 
 
 class YdlOpts(TypedDict):
@@ -141,7 +132,7 @@ def zzzload_cached_videos():
         return fetch_and_save_videos()["data"]
 
 
-def zzzcreate_videos_dataset(info):
+def zzz_create_videos_dataset(info):
     """Convertit les données brutes de YouTube en DataFrame pandas."""
     videos = []
     for entry in info.get("entries", []):
@@ -264,7 +255,7 @@ def zzzdisplay_videos_table(df):
 
 
 def read_cache():
-    if not os.path.exists(CACHE_FILE):
+    if not os.path.isfile(CACHE_FILE):
         return None
 
     try:
@@ -273,7 +264,38 @@ def read_cache():
 
         # Vérifie expiration
         if time.time() - data["timestamp"] < CACHE_TTL:
-            return data["version"]
+            # Compat: anciens dumps utilisaient parfois "version" au lieu de "videos".
+            videos = data.get("videos") or data.get("version")
+
+            # Compat: un ancien bug a pu sérialiser (videos, ok) -> [[...], true]
+            if (
+                isinstance(videos, list)
+                and len(videos) == 2
+                and isinstance(videos[1], bool)
+                and isinstance(videos[0], list)
+            ):
+                videos = videos[0]
+
+            return videos
+    except Exception:
+        pass
+
+    return None
+
+
+def read_cache_timestamp_fr():
+    if not os.path.isfile(CACHE_FILE):
+        return None
+
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        if "timestamp_fr" in data and data["timestamp_fr"]:
+            return data["timestamp_fr"]
+
+        if "timestamp" in data:
+            return timestamp2fr(data["timestamp"])
     except Exception:
         pass
 
@@ -287,6 +309,7 @@ def write_cache(videos):
                 {
                     "videos": videos,
                     "timestamp": time.time(),
+                    "timestamp_fr": timestamp2fr(time.time()),
                 },
                 f,
                 ensure_ascii=False,
@@ -496,23 +519,27 @@ def fetch_latest_videos():
 def videos_to_see():
     """Fonction principale pour obtenir la liste des vidéos sous forme de DataFrame."""
     cached = read_cache()
-    if cached:
+    if cached is not None:
+        cache_date = read_cache_timestamp_fr()
         print("Données chargées du cache.")
-        return pd.DataFrame(cached), True
-
-    print("On part à la chasse...")
+        if cache_date:
+            print(f"Dernière mise à jour du cache : {cache_date}")
+        return pd.DataFrame(cached)
 
     try:
-        latest = fetch_latest_videos()
+        latest, ok = fetch_latest_videos()
+        if not ok or latest is None:
+            return None
+
         write_cache(latest)
 
         # df = df.sort_values("upload_date", ascending=False) Si necessaire
 
-        return latest, False
+        return pd.DataFrame(latest)
 
     except Exception as e:
         print(f"Erreur lors de la récupération des vidéos : {e}")
-        return None, False
+        return None
 
     # analyze_dataset(df)
     return df
@@ -523,13 +550,17 @@ def videos_to_see():
 
 if __name__ == "__main__":
 
-    cls()
+    # cls()
 
     # Obtenir et trier le dataset
     df = videos_to_see()
+    if df is None or df.empty:
+        print("Aucune vidéo disponible.")
+        end()
+        raise SystemExit(1)
     
     # Afficher le tableau
-    # display_videos_table(df)
+    zzzdisplay_videos_table(df)
 
     end()
 

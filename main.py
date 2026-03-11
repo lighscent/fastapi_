@@ -44,8 +44,12 @@ if __name__ == "__main__":
     cls()
 
     # print(*["hello" for _ in range(3)], sep="\n")
-    timestamp2fruuu(1773168642)
+    # timestamp2fruuu(1773168642)
 
-    videos_to_see()
+    df = videos_to_see()
+    
+    print(df)
+
+    # display_videos_table(df)
 
     end()
