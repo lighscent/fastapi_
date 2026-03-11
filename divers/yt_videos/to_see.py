@@ -484,7 +484,7 @@ def fetch_latest_videos():
 
     except Exception as e:
         print(f"Erreur lors de la récupération de la liste des vidéos: {e}")
-        return df
+        return None, False
 
     # with yt_dlp.YoutubeDL(ydl_opts) as ydl:
     #     info = ydl.extract_info(url, download=False)

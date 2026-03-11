@@ -210,8 +210,8 @@ function Start-App {
   # Flet CLI supports --ignore-dirs (no --ignore-files in this version).
   # Prevent writing .pyc files during run to mimic "**/*.pyc" ignore behavior.
   $env:PYTHONDONTWRITEBYTECODE = "1"
-  # Full hot reload, with cache folder excluded from watcher.
-  flet run -d -r --ignore-dirs ".git,.venv,__pycache__,cache" main.py
+  # Full hot reload, while excluding cache directories that are updated at runtime.
+  flet run -d -r --ignore-dirs ".git,.venv,__pycache__,cache,divers/yt_videos/cache,kevindegila/cache" main.py
 }
 
 # --- Aide ---
