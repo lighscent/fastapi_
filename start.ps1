@@ -38,7 +38,7 @@ function Check-PowerShellVersion {
 
 function Show-Help {
   Write-Host "Utilisation : ./start [mode]"
-  Write-Host "  Sans argument  -> (.venv) flet run main.py"
+  Write-Host "  Sans argument  -> (.venv) flet run main.py (hot reload actif)"
   Write-Host "  0              -> Reset total (VEnv + dépendances)"
   Write-Host "  1              -> Ré-installe uniquement PyMoX_Kit"
   Write-Host "Options : -h, --help, help"
@@ -127,8 +127,8 @@ function Ensure-Venv {
   Write-Host "Création de l'environnement virtuel ← racine..."
   # py -3.11 -m venv .venv
   # py -3.12 -m venv .venv
-  # py -3.13 -m venv .venv
-  py -m venv .venv
+  py -3.13 -m venv .venv
+  # py -m venv .venv
   if (-not (Test-Path $VenvPath)) {
     Write-Host "[ERREUR] Échec de création de l'environnement virtuel."
     exit 1
@@ -210,7 +210,8 @@ function Start-App {
   # Flet CLI supports --ignore-dirs (no --ignore-files in this version).
   # Prevent writing .pyc files during run to mimic "**/*.pyc" ignore behavior.
   $env:PYTHONDONTWRITEBYTECODE = "1"
-  flet run -d -r --ignore-dirs ".git,.venv,__pycache__" main.py
+  # Full hot reload, with cache folder excluded from watcher.
+  flet run -d -r --ignore-dirs ".git,.venv,__pycache__,cache" main.py
 }
 
 # --- Aide ---
