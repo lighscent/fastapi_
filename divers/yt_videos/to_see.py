@@ -37,8 +37,8 @@ SUFFIX = ""
 # AUTHOR = "donaldprogrammeur"
 
 AUTHOR = "InformatiqueSansComplexe"
-AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos
 AUTHOR = "doro2255"
+AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos
 
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
 # CACHE_DIR = "D:/fastapi/kevindegila/cache"

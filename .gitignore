@@ -3,3 +3,4 @@
 .env
 kevindegila/cache/*.json
 pymox_shadow.png
+**/cache/**
