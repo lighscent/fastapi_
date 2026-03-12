@@ -26,17 +26,21 @@ if TYPE_CHECKING:
 # //2do faire effacer le .json lourd et devenu inutile à la fin du script.
 SUFFIX = ""
 
+# Définir l'auteur de la chaîne YouTube à suivre pour test du script
+
+AUTHOR = "doro2255"   # 1 seule vidéo
+# AUTHOR = "LionelCOTE" # Pour mise au point car peu de vidéos (~10)
+# AUTHOR = "c57-u5s"    # 16 videos
+# AUTHOR = "tseries" # Compte le + rémunérateur au monde, pour tester le script sur un gros volume de vidéos (plus de 25 000 vidéos !!! → Limiteur necessaire )
+
 # Définir l'auteur de la chaîne YouTube à suivre
 # AUTHOR = "donaldprogrammeur"
-
 # AUTHOR = "KevinDegila"
-# AUTHOR = "c57-u5s"
-# AUTHOR = "MachineLearnia"
+# AUTHOR = "InformatiqueSansComplexe"
 # AUTHOR = "donaldprogrammeur"
+# AUTHOR = "MachineLearnia"
 
-AUTHOR = "InformatiqueSansComplexe"
-AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos
-AUTHOR = "doro2255"
+# AUTHOR = "Alphorm" # Limiteur necessaire
 
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
 # CACHE_DIR = "D:/fastapi/kevindegila/cache"
@@ -44,15 +48,22 @@ url = f"https://www.youtube.com/@{AUTHOR}/videos"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(SCRIPT_DIR, f"cache/.{AUTHOR}_videos.json")
-CACHE_TTL = 600  # 3600 (1 heure) 86400 (1 jour) //2ar 1 jour à la fin
+CACHE_TTL = 86400 # 3600 (1 heure) 86400 (1 jour)
 
 
-class YdlOpts(TypedDict):
+class YdlOpts(TypedDict, total=False):
     extract_flat: bool
     dump_single_json: bool
     quiet: bool
     playlistend: None
     progress: bool
+    ignoreerrors: bool
+    retries: int
+    extractor_retries: int
+    sleep_interval: float
+    max_sleep_interval: float
+    sleep_interval_requests: float
+    sleep_before_extractor: float
 
 
 YDL_OPTS: YdlOpts = {
@@ -63,10 +74,18 @@ YDL_OPTS: YdlOpts = {
     "quiet": False,  # Afficher la progression
     "playlistend": None,  # Pas de limite sur le nombre de vidéos
     "progress": True,  # Afficher une barre de progression
-    # "sleep_interval": "3-30",  # Délai aléatoire en secondes entre chaque vidéo
-    # "sleep_interval_requests": 30, # Délai en secondes entre chaque requête
-    # "max_sleep_interval": 30,  # Délai max en secondes
-    # "sleep_before_extractor": 3,  # Délai avant la toute première extraction
+    # Évite qu'une vidéo indisponible fasse échouer toute la playlist.
+    "ignoreerrors": True,
+    
+    # Limiteur des impacts de rate-limit YouTube en espacant les requêtes.
+    # "sleep_before_extractor": 1,
+    # "sleep_interval_requests": 2,
+    # "sleep_interval": 2,
+    # "max_sleep_interval": 6,
+    
+    # Réessaie automatiquement en cas d'échec temporaire côté YouTube.
+    "retries": 5,
+    "extractor_retries": 5,
 }
 
 
@@ -217,12 +236,14 @@ def title_shorter(title, max_length=59):
 
 
 def format_duration(seconds):
-    """Convertit une durée en secondes en format HH:MM:SS"""
+    """Convertit une durée en secondes en MM:SS ou HH:MM:SS."""
     if pd.isna(seconds):
         return "N/A"
     hours = int(seconds // 3600)
     minutes = int((seconds % 3600) // 60)
     remaining_seconds = int(seconds % 60)
+    if hours == 0:
+        return f"{minutes:02d}:{remaining_seconds:02d}"
     return f"{hours:02d}:{minutes:02d}:{remaining_seconds:02d}"
 
 
@@ -416,8 +437,13 @@ def fetch_latest_videos():
             video_entries = playlist_infos.get("entries", [])
             total_videos_global = len(video_entries)
             videos = []
+            skipped_entries = 0
 
             for v in video_entries:
+                if not isinstance(v, dict):
+                    skipped_entries += 1
+                    continue
+
                 date = extract_video_datetime(v)
 
                 videos.append(
@@ -445,6 +471,10 @@ def fetch_latest_videos():
             print(
                 f"{total_videos_global} vidéo{'s' if total_videos_global>1 else ''} trouvées dans la playlist de {AUTHOR}"
             )
+            if skipped_entries:
+                print(
+                    f"{skipped_entries} entrée(s) ignorée(s) (vidéo indisponible / erreur récupérable)."
+                )
             return videos, True
 
     except Exception as e:
@@ -480,6 +510,31 @@ def format_remaining_time_fr(total_minutes):
         return "0 minute"
 
     return " et ".join(parts)
+
+
+def toSeeToBp(df):
+    """Construit le markdown des videos et l'ecrit dans le dossier cache."""
+    md = ""
+    md = "# BP Learning - Vidéos à voir\n\n"
+    md += f"## Auteur {AUTHOR}\n\n"
+
+    for _, row in df.iterrows():
+        md += (
+            "* [ ] ["
+            + f"{row['date_fr']} **{row['titre']}** {row['vues']} **{row['duree']}**"
+            + "]("
+            + row["url"]
+            + ")\n"
+        )
+
+    cache_dir = os.path.dirname(CACHE_FILE)
+    os.makedirs(cache_dir, exist_ok=True)
+    output_file = os.path.join(cache_dir, f"{AUTHOR}.md")
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(md)
+
+    print(f"Fichier markdown généré : {output_file}")
+    return md
 
 
 def videos_to_see():
@@ -529,9 +584,9 @@ if __name__ == "__main__":
 
     # Obtenir et trier le dataset
     df = videos_to_see()
-
+    md = toSeeToBp(df)
     # Afficher le tableau
-    zzzdisplay_videos_table(df)
+    # zzzdisplay_videos_table(df)
 
     end()
 
