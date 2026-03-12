@@ -44,7 +44,7 @@ def toSeeToBp(df):
     # ❌ save this file .md
     return md
 
-from divers.yt_videos.to_see import videos_to_see
+from divers.yt_videos.to_see import videos_to_see, format_remaining_time_fr
 
 if __name__ == "__main__":
 
@@ -54,10 +54,13 @@ if __name__ == "__main__":
     # timestamp2fruuu(1773168642)
 
     df = videos_to_see()
-    print(df)
-    
-    md = toSeeToBp(df)
-    print(md)
+    # print(df)
+
+    # nbmn=2450
+    # print(nbmn, '→', format_remaining_time_fr(nbmn))
+
+    # md = toSeeToBp(df)
+    # print(md)
 
     # display_videos_table(df)
 

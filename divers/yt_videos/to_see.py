@@ -1,14 +1,15 @@
 from datetime import datetime
 import json, locale, os, time, yt_dlp
+from importlib import import_module
 import pandas as pd
 from typing import TYPE_CHECKING, TypedDict, cast
 from pymox_kit import *
 
-
-if __package__:
-    from .cache_utils import get_valid_cache_entry, write_videos_cache
-else:
-    from cache_utils import get_valid_cache_entry, write_videos_cache
+_cache_utils_module = import_module(
+    f"{__package__}.cache_utils" if __package__ else "cache_utils"
+)
+get_valid_cache_entry = _cache_utils_module.get_valid_cache_entry
+write_videos_cache = _cache_utils_module.write_videos_cache
 
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 
@@ -207,7 +208,7 @@ def format_date(date):
         return "N/A2"
 
 
-def zzzformat_title(title, max_length=59):
+def title_shorter(title, max_length=59):
     """Tronque le titre à max_length caractères et ajoute ... si nécessaire"""
     title = str(title or "N/A")
     if len(title) > max_length:
@@ -236,7 +237,7 @@ def zzzdisplay_videos_table(df):
         table_data.append(
             [
                 format_date(row["upload_date"]),
-                format_title(row.get("title", "N/A")),
+                title_shorter(row.get("title", "N/A")),
                 format_duration(row.get("duration")),
             ]
         )
@@ -466,15 +467,19 @@ def pluralize_fr(value, singular, plural=None):
 
 def format_remaining_time_fr(total_minutes):
     """Formate un délai en français: minutes ou heures + minutes."""
-    if total_minutes < 60:
-        return f"{total_minutes} {pluralize_fr(total_minutes, 'minute')}"
-
     hours = total_minutes // 60
     minutes = total_minutes % 60
-    return (
-        f"{hours} {pluralize_fr(hours, 'heure')} "
-        f"et {minutes} {pluralize_fr(minutes, 'minute')}"
-    )
+    parts = []
+
+    if hours > 0:
+        parts.append(f"{hours} {pluralize_fr(hours, 'heure')}")
+    if minutes > 0:
+        parts.append(f"{minutes} {pluralize_fr(minutes, 'minute')}")
+
+    if not parts:
+        return "0 minute"
+
+    return " et ".join(parts)
 
 
 def videos_to_see():
@@ -514,19 +519,19 @@ def videos_to_see():
     return df
 
 
+def test_heure(minutes=123):
+    print(format_remaining_time_fr(minutes))
+
+
 if __name__ == "__main__":
 
     # cls()
 
     # Obtenir et trier le dataset
     df = videos_to_see()
-    if df is None or df.empty:
-        print("Aucune vidéo disponible.")
-        end()
-        raise SystemExit(1)
 
     # Afficher le tableau
-    # zzzdisplay_videos_table(df)
+    zzzdisplay_videos_table(df)
 
     end()
 
