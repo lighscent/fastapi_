@@ -37,7 +37,7 @@ url = f"https://www.youtube.com/@{AUTHOR}/videos"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(SCRIPT_DIR, f"cache/.{AUTHOR}_videos.json")
-CACHE_TTL = 3600  # 3600 (1 heure) 86400 (1 jour) //2ar 1 jour à la fin
+CACHE_TTL = 600  # 3600 (1 heure) 86400 (1 jour) //2ar 1 jour à la fin
 
 
 class YdlOpts(TypedDict):
@@ -283,7 +283,7 @@ def read_cache():
     return None
 
 
-def read_cache_timestamp_fr():
+def read_cache_data(field="None"):
     if not os.path.isfile(CACHE_FILE):
         return None
 
@@ -291,11 +291,9 @@ def read_cache_timestamp_fr():
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        if "timestamp_fr" in data and data["timestamp_fr"]:
-            return data["timestamp_fr"]
+        if field in data and data[field]:
+            return data[field]
 
-        if "timestamp" in data:
-            return timestamp2fr(data["timestamp"])
     except Exception:
         pass
 
@@ -520,10 +518,39 @@ def videos_to_see():
     """Fonction principale pour obtenir la liste des vidéos sous forme de DataFrame."""
     cached = read_cache()
     if cached is not None:
-        cache_date = read_cache_timestamp_fr()
+        cache_date = read_cache_data("timestamp_fr")
+        cache_timestamp = read_cache_data("timestamp")
         print("Données chargées du cache.")
         if cache_date:
-            print(f"Dernière mise à jour du cache : {cache_date}")
+            remaining_seconds = None
+            if isinstance(cache_timestamp, (int, float)):
+                remaining_seconds = max(0, int(CACHE_TTL - (time.time() - cache_timestamp)))
+
+            if remaining_seconds is not None:
+                remaining_minutes = max(1, (remaining_seconds + 59) // 60)
+                if remaining_minutes < 60:
+                    print(
+                        f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {remaining_minutes} minute{'s' if remaining_minutes>1 else ''})"
+                    )
+                else:
+                    hours = remaining_minutes // 60
+                    minutes = remaining_minutes % 60
+                    print(
+                        f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {hours} heure{'s' if hours>1 else ''} et {minutes} minute{'s' if minutes>1 else ''})"
+                    )
+            else:
+                # Fallback si le timestamp brut n'est pas disponible
+                ttl_minutes = max(1, CACHE_TTL // 60)
+                if ttl_minutes < 60:
+                    print(
+                        f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {ttl_minutes} minute{'s' if ttl_minutes>1 else ''})"
+                    )
+                else:
+                    hours = ttl_minutes // 60
+                    minutes = ttl_minutes % 60
+                    print(
+                        f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {hours} heure{'s' if hours>1 else ''} et {minutes} minute{'s' if minutes>1 else ''})"
+                    )
         return pd.DataFrame(cached)
 
     try:
@@ -558,9 +585,9 @@ if __name__ == "__main__":
         print("Aucune vidéo disponible.")
         end()
         raise SystemExit(1)
-    
+
     # Afficher le tableau
-    zzzdisplay_videos_table(df)
+    # zzzdisplay_videos_table(df)
 
     end()
 

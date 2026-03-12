@@ -37,6 +37,13 @@ def timestamp2fruuu(ts=1773168642):
     print(date_fr)
 
 
+def toSeeToBp(df):
+    md = ""
+    for _, row in df.iterrows():
+        md += f"* [ ] [{row['titre']}]({row['url']})\n"
+    # ❌ save this file .md
+    return md
+
 from divers.yt_videos.to_see import videos_to_see
 
 if __name__ == "__main__":
@@ -47,8 +54,10 @@ if __name__ == "__main__":
     # timestamp2fruuu(1773168642)
 
     df = videos_to_see()
-    
     print(df)
+    
+    md = toSeeToBp(df)
+    print(md)
 
     # display_videos_table(df)
 
