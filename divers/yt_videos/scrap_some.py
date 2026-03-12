@@ -10,7 +10,10 @@ import yt_dlp
 
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 
+# AUTHOR = "Gravenilvectuto"  # 174 videos - 49 heures et 39 minutes
 AUTHOR = "LionelCOTE"
+AUTHOR = "KevinDegila"
+
 URL = f"https://www.youtube.com/@{AUTHOR}/videos"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,9 +31,10 @@ YDL_OPTS_LIST = {
 YDL_OPTS_DETAIL = {
     "extract_flat": False,
     "quiet": False,
+    "progress": True,  # Afficher une barre de progression
     "ignoreerrors": True,
-    "retries": 2,
-    "extractor_retries": 2,
+    "retries": 3,
+    "extractor_retries": 3,
 }
 
 
@@ -95,6 +99,28 @@ def build_video_payload(v):
     }
 
 
+def video_sort_key(video):
+    """Clé de tri des vidéos par date de parution (plus récente d'abord)."""
+    if not isinstance(video, dict):
+        return datetime.min
+
+    date_str = video.get("date")
+    if isinstance(date_str, str):
+        try:
+            return datetime.strptime(date_str, "%Y%m%d")
+        except ValueError:
+            pass
+
+    date_fr = video.get("date_fr")
+    if isinstance(date_fr, str):
+        try:
+            return datetime.strptime(date_fr, "%d/%m/%Y")
+        except ValueError:
+            pass
+
+    return datetime.min
+
+
 def write_result(videos, der_id, total_playlist):
     os.makedirs(STORAGE_DIR, exist_ok=True)
     now_ts = time.time()
@@ -142,22 +168,25 @@ def scrap_some():
 
     videos, start_after_id = read_previous_result()
     existing_ids = {v.get("id") for v in videos if isinstance(v, dict) and v.get("id")}
-    existing_scrapees = len(videos)
-    simulated_failure_position = get_simulated_failure_position(existing_scrapees)
+    # existing_scrapees = len(videos)
+    # simulated_failure_position = get_simulated_failure_position(existing_scrapees)
+    # simulated_failure_position = None  # Simulation désactivée
     der_id = start_after_id
     total_playlist = None
 
     if start_after_id:
-        print(f"Reprise après der_id={start_after_id}")
+        print(
+            f"État précédent détecté (der_id={start_after_id}). Vérification complète des IDs pour combler les trous."
+        )
     else:
         print("Aucun état précédent trouvé, démarrage depuis la première vidéo.")
 
-    if simulated_failure_position is not None:
-        print(
-            f"Panne simulée configurée sur la vidéo globale #{simulated_failure_position}."
-        )
-    else:
-        print("Aucune panne simulée: ce run doit aller jusqu'au bout.")
+    # if simulated_failure_position is not None:
+    #     print(
+    #         f"Panne simulée configurée sur la vidéo globale #{simulated_failure_position}."
+    #     )
+    # else:
+    #     print("Aucune panne simulée: ce run doit aller jusqu'au bout.")
 
     try:
         with yt_dlp.YoutubeDL(YDL_OPTS_LIST) as ydl_list:
@@ -172,8 +201,21 @@ def scrap_some():
             else f"Nombre inconnu (au moins {len(entries)}) de"
         )
         print(f"{RED}{total_videos_txt} vidéos{R} trouvées dans la playlist.")
+        total_entries = len(entries)
+        run_processed = 0
+        playlist_ids = [
+            e.get("id")
+            for e in entries
+            if isinstance(e, dict) and isinstance(e.get("id"), str)
+        ]
+        missing_in_cache = [video_id for video_id in playlist_ids if video_id not in existing_ids]
 
-        collecting = start_after_id is None
+        if missing_in_cache:
+            print(
+                f"{YELLOW}{len(missing_in_cache)} vidéo(s) absente(s) du cache seront (re)téléchargées.{R}"
+            )
+        else:
+            print("Aucun trou détecté dans le cache pour les IDs connus de la playlist.")
 
         with yt_dlp.YoutubeDL(YDL_OPTS_DETAIL) as ydl_detail:
             for idx, entry in enumerate(entries, start=1):
@@ -182,20 +224,23 @@ def scrap_some():
 
                 current_id = entry.get("id")
 
-                if not collecting:
-                    if current_id == start_after_id:
-                        collecting = True
+                # On saute immédiatement les vidéos déjà présentes dans le cache.
+                if isinstance(current_id, str) and current_id in existing_ids:
                     continue
 
                 # Panne simulée progressive: 3e puis 6e, puis plus de panne.
-                if simulated_failure_position is not None and idx == simulated_failure_position:
-                    raise RuntimeError(
-                        f"Erreur simulée sur la vidéo globale #{simulated_failure_position}"
-                    )
+                # if simulated_failure_position is not None and idx == simulated_failure_position:
+                #     raise RuntimeError(
+                #         f"Erreur simulée sur la vidéo globale #{simulated_failure_position}"
+                #     )
 
                 video_url = entry.get("url") or entry.get("webpage_url")
                 if not video_url:
                     continue
+
+                print(
+                    f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécution n°{run_processed + 1}{R}"
+                )
 
                 video_detail = ydl_detail.extract_info(video_url, download=False)
                 if not isinstance(video_detail, dict):
@@ -208,11 +253,17 @@ def scrap_some():
                 videos.append(video)
                 if video_id:
                     existing_ids.add(video_id)
-                der_id = video_id
+                run_processed += 1
+
+        # der_id doit rester le dernier ID de la playlist (pas le dernier ajouté),
+        # pour conserver une métadonnée stable même en mode rattrapage de trous.
+        if playlist_ids:
+            der_id = playlist_ids[-1]
 
     except Exception as e:
         print(f"Scrap interrompu: {e}")
 
+    videos = sorted(videos, key=video_sort_key, reverse=True)
     write_result(videos=videos, der_id=der_id, total_playlist=total_playlist)
     scrapees = len(videos)
     complete = (

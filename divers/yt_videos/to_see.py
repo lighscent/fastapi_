@@ -30,32 +30,33 @@ SUFFIX = ""
 # Ici,uniquement des ressources francophones
 
 # Pour mise au point du script
-# AUTHOR = "doro2255"   # 1 seule vidéo (7')
-# AUTHOR = "LionelCOTE" # Pour mise au point car peu de vidéos (~12 - 1H30)
+AUTHOR = "doro2255"   # 1 seule vidéo (7')
+# AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos (~12 - 1H30)
 # AUTHOR = "c57-u5s"    # 16 videos - 11 heures et 23 minutes
-# AUTHOR = "tseries"    # Compte le + rémunérateur au monde, pour tester le script sur un gros volume de vidéos (plus de 25 000 vidéos !!! → Limiteur necessaire )
 # AUTHOR = "Alphorm" # Limiteur necessaire
+# AUTHOR = "tseries"    # Compte le + rémunérateur au monde, pour tester le script sur un gros volume de vidéos (plus de 25 000 vidéos !!! → Limiteur necessaire )
 
 # Initiation à Python (Bases)
-AUTHOR = "Gravenilvectuto"  # 174 videos - 49 heures et 39 minutes
-AUTHOR = "CodeAvecJonathan" #  10 videos - 15 heures et 16 minutes
-AUTHOR = "hassanbahi"       # ❌ 843 vidéos - total duration
+# AUTHOR = "Gravenilvectuto"  # 174 videos - 49 heures et 39 minutes
+# AUTHOR = "CodeAvecJonathan" #  10 videos - 15 heures et 16 minutes
+# AUTHOR = "hassanbahi"       # ❌ 843 vidéos - total duration
 
 # Python approfondi
 # AUTHOR = "donaldprogrammeur" # Des bases à DevOps (424 vidéos) → Limitateur nécessaire
 
 # Python pour l'I.A. ❌
-# AUTHOR = "KevinDegila"
+# AUTHOR = "KevinDegila"  # 262 vidéos -
 # AUTHOR = "InformatiqueSansComplexe"
-# AUTHOR = "donaldprogrammeur"
 # AUTHOR = "MachineLearnia"
+
+AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos (~12 - 1H30)
+AUTHOR = "KevinDegila"  # 262 vidéos -
+
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
-# CACHE_DIR = "D:/fastapi/kevindegila/cache"
-# CACHE_FILE = os.path.join(CACHE_DIR, f"{AUTHOR}_videos{SUFFIX}.json")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(SCRIPT_DIR, f"cache/.{AUTHOR}_videos.json")
-CACHE_TTL = 600  # 3600 (1 heure) 86400 (1 jour)
+CACHE_TTL = 3600  # 3600 (1 heure) 86400 (1 jour)
 
 
 class YdlOpts(TypedDict, total=False):
@@ -525,18 +526,16 @@ def toSeeToBp(df):
     nb_videos_txt = str(nb_videos) + " video" + ("s" if len(df) > 1 else "")
     total_duration = 777
 
-
     # stats = df.agg({"duration": ["min", "max", "mean", 'sum']})
     # print(stats)
     # print(stats.at['sum', 'duration'])
-    total_duration = format_remaining_time_fr(df['duration'].sum()//60)
+    total_duration = format_remaining_time_fr(df["duration"].sum() // 60)
     # print(total_duration)
-    
+
     md = ""
     md = "# BP Learning - Vidéos à voir\n\n"
     md += f"## Auteur **[{AUTHOR}]({url})** ({nb_videos_txt} - {total_duration})\n\n"
     print(md)
-
 
     for _, row in df.iterrows():
         md += (
