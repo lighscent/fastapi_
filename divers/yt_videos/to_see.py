@@ -4,6 +4,12 @@ import pandas as pd
 from typing import TYPE_CHECKING, TypedDict, cast
 from pymox_kit import *
 
+
+if __package__:
+    from .cache_utils import get_valid_cache_entry, write_videos_cache
+else:
+    from cache_utils import get_valid_cache_entry, write_videos_cache
+
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 
 if TYPE_CHECKING:
@@ -37,7 +43,7 @@ url = f"https://www.youtube.com/@{AUTHOR}/videos"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(SCRIPT_DIR, f"cache/.{AUTHOR}_videos.json")
-CACHE_TTL = 600  # 3600 (1 heure) 86400 (1 jour) //2ar 1 jour à la fin
+CACHE_TTL = 86400  # 3600 (1 heure) 86400 (1 jour) //2ar 1 jour à la fin
 
 
 class YdlOpts(TypedDict):
@@ -252,69 +258,6 @@ def zzzdisplay_videos_table(df):
     # Afficher le tableau
     print("\n=== Liste des vidéos de Kevin Degila ===")
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
-
-
-def read_cache():
-    if not os.path.isfile(CACHE_FILE):
-        return None
-
-    try:
-        with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        # Vérifie expiration
-        if time.time() - data["timestamp"] < CACHE_TTL:
-            # Compat: anciens dumps utilisaient parfois "version" au lieu de "videos".
-            videos = data.get("videos") or data.get("version")
-
-            # Compat: un ancien bug a pu sérialiser (videos, ok) -> [[...], true]
-            if (
-                isinstance(videos, list)
-                and len(videos) == 2
-                and isinstance(videos[1], bool)
-                and isinstance(videos[0], list)
-            ):
-                videos = videos[0]
-
-            return videos
-    except Exception:
-        pass
-
-    return None
-
-
-def read_cache_data(field="None"):
-    if not os.path.isfile(CACHE_FILE):
-        return None
-
-    try:
-        with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        if field in data and data[field]:
-            return data[field]
-
-    except Exception:
-        pass
-
-    return None
-
-
-def write_cache(videos):
-    try:
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(
-                {
-                    "videos": videos,
-                    "timestamp": time.time(),
-                    "timestamp_fr": timestamp2fr(time.time()),
-                },
-                f,
-                ensure_ascii=False,
-                indent=2,
-            )
-    except Exception:
-        pass
 
 
 # Charger ou créer le dataset
@@ -534,27 +477,18 @@ def format_remaining_time_fr(total_minutes):
     )
 
 
-def get_remaining_cache_minutes(cache_timestamp):
-    """Retourne le temps restant du cache en minutes (arrondi au dessus)."""
-    if not isinstance(cache_timestamp, (int, float)):
-        return max(1, CACHE_TTL // 60)
-
-    remaining_seconds = max(0, int(CACHE_TTL - (time.time() - cache_timestamp)))
-    return max(1, (remaining_seconds + 59) // 60)
-
-
 def videos_to_see():
     """Fonction principale pour obtenir la liste des vidéos sous forme de DataFrame."""
-    cached = read_cache()
-    if cached is not None:
-        cache_date = read_cache_data("timestamp_fr")
-        cache_timestamp = read_cache_data("timestamp")
-        print("Données chargées du cache", end=' ')
+    cache_entry = get_valid_cache_entry(CACHE_FILE, CACHE_TTL)
+    if cache_entry is not None:
+        cached = cache_entry["videos"]
+        cache_date = cache_entry.get("timestamp_fr")
+        remaining_minutes = cache_entry["remaining_minutes"]
+        print("Données chargées du cache.")
         if cache_date:
-            remaining_minutes = get_remaining_cache_minutes(cache_timestamp)
             remaining_text = format_remaining_time_fr(remaining_minutes)
             print(
-                f": {cache_date} (Prochaine dans environ {remaining_text})"
+                f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {CYAN}{remaining_text}{R})"
             )
         return pd.DataFrame(cached)
 
@@ -563,7 +497,7 @@ def videos_to_see():
         if not ok or latest is None:
             return None
 
-        write_cache(latest)
+        write_videos_cache(CACHE_FILE, latest, timestamp_formatter=timestamp2fr)
 
         # df = df.sort_values("upload_date", ascending=False) Si necessaire
 
