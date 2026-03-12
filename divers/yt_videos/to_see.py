@@ -44,7 +44,7 @@ url = f"https://www.youtube.com/@{AUTHOR}/videos"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(SCRIPT_DIR, f"cache/.{AUTHOR}_videos.json")
-CACHE_TTL = 86400  # 3600 (1 heure) 86400 (1 jour) //2ar 1 jour à la fin
+CACHE_TTL = 600  # 3600 (1 heure) 86400 (1 jour) //2ar 1 jour à la fin
 
 
 class YdlOpts(TypedDict):

@@ -40,7 +40,13 @@ def timestamp2fruuu(ts=1773168642):
 def toSeeToBp(df):
     md = ""
     for _, row in df.iterrows():
-        md += f"* [ ] [{row['titre']}]({row['url']})\n"
+        
+        rec = ['titre', 'date', 'vues', 'duree', 'url']
+        
+        md += f"* [ ] [{row['titre'], row['duree']}]({row['url']})\n"
+        
+        
+        
     # ❌ save this file .md
     return md
 
@@ -54,13 +60,13 @@ if __name__ == "__main__":
     # timestamp2fruuu(1773168642)
 
     df = videos_to_see()
-    # print(df)
+    print()
 
     # nbmn=2450
     # print(nbmn, '→', format_remaining_time_fr(nbmn))
 
-    # md = toSeeToBp(df)
-    # print(md)
+    md = toSeeToBp(df)
+    print(md)
 
     # display_videos_table(df)
 
