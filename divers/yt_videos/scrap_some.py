@@ -1,4 +1,5 @@
 from datetime import datetime
+from importlib import import_module
 import json
 import locale
 import os
@@ -10,15 +11,38 @@ import yt_dlp
 
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 
+# Pour mise au point du script
+# AUTHOR = "doro2255"  # 1 seule vidéo (7')
+# AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos (~12 - 1H30)
+# AUTHOR = "c57-u5s"  # 16 videos - 11 heures et 23 minutes
+# AUTHOR = "Alphorm"  # Limiteur necessaire
+# AUTHOR = "tseries"  # Très gros volume, limiter les requêtes
+
+# Initiation à Python (Bases)
 # AUTHOR = "Gravenilvectuto"  # 174 videos - 49 heures et 39 minutes
-AUTHOR = "LionelCOTE"
-AUTHOR = "KevinDegila"
+# AUTHOR = "CodeAvecJonathan"  # 10 videos - 15 heures et 16 minutes
+# AUTHOR = "hassanbahi"  # 843 vidéos
+
+# Python approfondi
+# AUTHOR = "donaldprogrammeur"  # Des bases à DevOps (424 vidéos)
+
+# Python pour l'IA
+AUTHOR = "KevinDegila"  # 262 vidéos
+# AUTHOR = "InformatiqueSansComplexe"
+# AUTHOR = "MachineLearnia"
 
 URL = f"https://www.youtube.com/@{AUTHOR}/videos"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 STORAGE_DIR = os.path.join(SCRIPT_DIR, "cache")
 OUTPUT_FILE = os.path.join(STORAGE_DIR, f".{AUTHOR}_videos_scrap_some.json")
+OUTPUT_MD_FILE = os.path.join(STORAGE_DIR, f"{AUTHOR}.md")
+CACHE_TTL = 3600  # 3600 = 1 heure - 86400 = 1 jour
+
+_cache_utils_module = import_module(
+    f"{__package__}.cache_utils" if __package__ else "cache_utils"
+)
+get_valid_cache_entry = _cache_utils_module.get_valid_cache_entry
 
 YDL_OPTS_LIST = {
     "extract_flat": True,
@@ -121,6 +145,67 @@ def video_sort_key(video):
     return datetime.min
 
 
+def pluralize_fr(value, singular, plural=None):
+    if plural is None:
+        plural = singular + "s"
+    return singular if value == 1 else plural
+
+
+def format_remaining_time_fr(total_minutes):
+    hours = total_minutes // 60
+    minutes = total_minutes % 60
+    parts = []
+
+    if hours > 0:
+        parts.append(f"{hours} {pluralize_fr(hours, 'heure')}")
+    if minutes > 0:
+        parts.append(f"{minutes} {pluralize_fr(minutes, 'minute')}")
+
+    if not parts:
+        return "0 minute"
+
+    return " et ".join(parts)
+
+
+def write_markdown(videos):
+    if not isinstance(videos, list):
+        return
+
+    total_duration_seconds = sum(
+        int(v.get("duration") or 0) for v in videos if isinstance(v, dict)
+    )
+    total_duration_txt = format_remaining_time_fr(total_duration_seconds // 60)
+    nb_videos_txt = f"{len(videos)} video{'s' if len(videos) > 1 else ''}"
+
+    md = "# BP Learning - Vidéos à voir\n\n"
+    md += (
+        f"## Auteur **[{AUTHOR}]({URL})** ({nb_videos_txt} - {total_duration_txt})\n\n"
+    )
+
+    for video in videos:
+        if not isinstance(video, dict):
+            continue
+
+        titre = video.get("titre") or "N/A"
+        vues = video.get("vues") if isinstance(video.get("vues"), int) else 0
+        duree = video.get("duree") or "N/A"
+        date_fr = video.get("date_fr") or "N/A"
+        url = video.get("url") or ""
+
+        if not url:
+            continue
+
+        md += (
+            "* [ ] [" + f"{date_fr} **{titre}** {vues} **{duree}**" + "](" + url + ")\n"
+        )
+
+    os.makedirs(STORAGE_DIR, exist_ok=True)
+    with open(OUTPUT_MD_FILE, "w", encoding="utf-8") as f:
+        f.write(md)
+
+    print(f"Fichier markdown généré : {OUTPUT_MD_FILE}")
+
+
 def write_result(videos, der_id, total_playlist):
     os.makedirs(STORAGE_DIR, exist_ok=True)
     now_ts = time.time()
@@ -154,6 +239,26 @@ def read_previous_result():
         return [], None
 
 
+def read_previous_counts():
+    """Retourne les compteurs du dernier JSON pour savoir si le cache est complet."""
+    if not os.path.isfile(OUTPUT_FILE):
+        return None, None
+
+    try:
+        with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        scrapees = data.get("scrapees") if isinstance(data.get("scrapees"), int) else None
+        total_playlist = (
+            data.get("total_playlist")
+            if isinstance(data.get("total_playlist"), int)
+            else None
+        )
+        return scrapees, total_playlist
+    except Exception:
+        return None, None
+
+
 def get_simulated_failure_position(existing_scrapees):
     """Retourne la position globale de panne simulée selon l'avancement."""
     if existing_scrapees < 2:
@@ -165,6 +270,35 @@ def get_simulated_failure_position(existing_scrapees):
 
 def scrap_some():
     print(f"SCRAP des vidéos de {AUTHOR}\n{URL}")
+
+    cache_entry = get_valid_cache_entry(OUTPUT_FILE, CACHE_TTL)
+    if cache_entry is not None:
+        cached_videos = cache_entry.get("videos")
+        cache_date = cache_entry.get("timestamp_fr")
+        remaining_minutes = cache_entry.get("remaining_minutes")
+        scrapees, total_playlist = read_previous_counts()
+        cache_is_complete = (
+            isinstance(scrapees, int)
+            and isinstance(total_playlist, int)
+            and scrapees >= total_playlist
+        )
+
+        if isinstance(scrapees, int) and isinstance(total_playlist, int) and not cache_is_complete:
+            print(
+                f"Cache valide mais incomplet ({scrapees}/{total_playlist}) : reprise du scraping pour combler les trous."
+            )
+
+        if isinstance(cached_videos, list):
+            cached_videos = sorted(cached_videos, key=video_sort_key, reverse=True)
+            if cache_is_complete:
+                print("Données chargées depuis le cache JSON (valide 1h).")
+                if cache_date and isinstance(remaining_minutes, int):
+                    remaining_txt = format_remaining_time_fr(remaining_minutes)
+                    print(
+                        f"Dernière mise à jour: {cache_date} (prochaine actualisation dans environ {CYAN}{remaining_txt}{R})."
+                    )
+                write_markdown(cached_videos)
+                return
 
     videos, start_after_id = read_previous_result()
     existing_ids = {v.get("id") for v in videos if isinstance(v, dict) and v.get("id")}
@@ -208,14 +342,18 @@ def scrap_some():
             for e in entries
             if isinstance(e, dict) and isinstance(e.get("id"), str)
         ]
-        missing_in_cache = [video_id for video_id in playlist_ids if video_id not in existing_ids]
+        missing_in_cache = [
+            video_id for video_id in playlist_ids if video_id not in existing_ids
+        ]
 
         if missing_in_cache:
             print(
                 f"{YELLOW}{len(missing_in_cache)} vidéo(s) absente(s) du cache seront (re)téléchargées.{R}"
             )
         else:
-            print("Aucun trou détecté dans le cache pour les IDs connus de la playlist.")
+            print(
+                "Aucun trou détecté dans le cache pour les IDs connus de la playlist."
+            )
 
         with yt_dlp.YoutubeDL(YDL_OPTS_DETAIL) as ydl_detail:
             for idx, entry in enumerate(entries, start=1):
@@ -265,10 +403,9 @@ def scrap_some():
 
     videos = sorted(videos, key=video_sort_key, reverse=True)
     write_result(videos=videos, der_id=der_id, total_playlist=total_playlist)
+    write_markdown(videos)
     scrapees = len(videos)
-    complete = (
-        isinstance(total_playlist, int) and total_playlist == scrapees
-    )
+    complete = isinstance(total_playlist, int) and total_playlist == scrapees
     print(f"Fichier JSON écrit: {OUTPUT_FILE}")
     print(f"scrapees={scrapees}, total_playlist={total_playlist}, complete={complete}")
     print(f"der_id={der_id}")
