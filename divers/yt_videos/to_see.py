@@ -514,43 +514,48 @@ def fetch_latest_videos():
     # return create_videos_dataset(info)
 
 
+def pluralize_fr(value, singular, plural=None):
+    """Retourne le mot au singulier/pluriel selon la valeur."""
+    if plural is None:
+        plural = singular + "s"
+    return singular if value == 1 else plural
+
+
+def format_remaining_time_fr(total_minutes):
+    """Formate un délai en français: minutes ou heures + minutes."""
+    if total_minutes < 60:
+        return f"{total_minutes} {pluralize_fr(total_minutes, 'minute')}"
+
+    hours = total_minutes // 60
+    minutes = total_minutes % 60
+    return (
+        f"{hours} {pluralize_fr(hours, 'heure')} "
+        f"et {minutes} {pluralize_fr(minutes, 'minute')}"
+    )
+
+
+def get_remaining_cache_minutes(cache_timestamp):
+    """Retourne le temps restant du cache en minutes (arrondi au dessus)."""
+    if not isinstance(cache_timestamp, (int, float)):
+        return max(1, CACHE_TTL // 60)
+
+    remaining_seconds = max(0, int(CACHE_TTL - (time.time() - cache_timestamp)))
+    return max(1, (remaining_seconds + 59) // 60)
+
+
 def videos_to_see():
     """Fonction principale pour obtenir la liste des vidéos sous forme de DataFrame."""
     cached = read_cache()
     if cached is not None:
         cache_date = read_cache_data("timestamp_fr")
         cache_timestamp = read_cache_data("timestamp")
-        print("Données chargées du cache.")
+        print("Données chargées du cache", end=' ')
         if cache_date:
-            remaining_seconds = None
-            if isinstance(cache_timestamp, (int, float)):
-                remaining_seconds = max(0, int(CACHE_TTL - (time.time() - cache_timestamp)))
-
-            if remaining_seconds is not None:
-                remaining_minutes = max(1, (remaining_seconds + 59) // 60)
-                if remaining_minutes < 60:
-                    print(
-                        f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {remaining_minutes} minute{'s' if remaining_minutes>1 else ''})"
-                    )
-                else:
-                    hours = remaining_minutes // 60
-                    minutes = remaining_minutes % 60
-                    print(
-                        f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {hours} heure{'s' if hours>1 else ''} et {minutes} minute{'s' if minutes>1 else ''})"
-                    )
-            else:
-                # Fallback si le timestamp brut n'est pas disponible
-                ttl_minutes = max(1, CACHE_TTL // 60)
-                if ttl_minutes < 60:
-                    print(
-                        f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {ttl_minutes} minute{'s' if ttl_minutes>1 else ''})"
-                    )
-                else:
-                    hours = ttl_minutes // 60
-                    minutes = ttl_minutes % 60
-                    print(
-                        f"Dernière mise à jour du cache : {cache_date} (Prochaine dans environ {hours} heure{'s' if hours>1 else ''} et {minutes} minute{'s' if minutes>1 else ''})"
-                    )
+            remaining_minutes = get_remaining_cache_minutes(cache_timestamp)
+            remaining_text = format_remaining_time_fr(remaining_minutes)
+            print(
+                f": {cache_date} (Prochaine dans environ {remaining_text})"
+            )
         return pd.DataFrame(cached)
 
     try:
