@@ -26,29 +26,36 @@ if TYPE_CHECKING:
 # //2do faire effacer le .json lourd et devenu inutile à la fin du script.
 SUFFIX = ""
 
-# Définir l'auteur de la chaîne YouTube à suivre pour test du script
+# Définir l'auteur de la chaîne YouTube à suivre ou pour test du script
+# Ici,uniquement des ressources francophones
 
-AUTHOR = "doro2255"   # 1 seule vidéo
-# AUTHOR = "LionelCOTE" # Pour mise au point car peu de vidéos (~10)
-# AUTHOR = "c57-u5s"    # 16 videos
-# AUTHOR = "tseries" # Compte le + rémunérateur au monde, pour tester le script sur un gros volume de vidéos (plus de 25 000 vidéos !!! → Limiteur necessaire )
+# Pour mise au point du script
+# AUTHOR = "doro2255"   # 1 seule vidéo (7')
+# AUTHOR = "LionelCOTE" # Pour mise au point car peu de vidéos (~12 - 1H30)
+# AUTHOR = "c57-u5s"    # 16 videos - 11 heures et 23 minutes
+# AUTHOR = "tseries"    # Compte le + rémunérateur au monde, pour tester le script sur un gros volume de vidéos (plus de 25 000 vidéos !!! → Limiteur necessaire )
+# AUTHOR = "Alphorm" # Limiteur necessaire
 
-# Définir l'auteur de la chaîne YouTube à suivre
-# AUTHOR = "donaldprogrammeur"
+# Initiation à Python (Bases)
+AUTHOR = "Gravenilvectuto"  # 174 videos - 49 heures et 39 minutes
+AUTHOR = "CodeAvecJonathan" #  10 videos - 15 heures et 16 minutes
+AUTHOR = "hassanbahi"       # ❌ 843 vidéos - total duration
+
+# Python approfondi
+# AUTHOR = "donaldprogrammeur" # Des bases à DevOps (424 vidéos) → Limitateur nécessaire
+
+# Python pour l'I.A. ❌
 # AUTHOR = "KevinDegila"
 # AUTHOR = "InformatiqueSansComplexe"
 # AUTHOR = "donaldprogrammeur"
 # AUTHOR = "MachineLearnia"
-
-# AUTHOR = "Alphorm" # Limiteur necessaire
-
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
 # CACHE_DIR = "D:/fastapi/kevindegila/cache"
 # CACHE_FILE = os.path.join(CACHE_DIR, f"{AUTHOR}_videos{SUFFIX}.json")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE_FILE = os.path.join(SCRIPT_DIR, f"cache/.{AUTHOR}_videos.json")
-CACHE_TTL = 86400 # 3600 (1 heure) 86400 (1 jour)
+CACHE_TTL = 600  # 3600 (1 heure) 86400 (1 jour)
 
 
 class YdlOpts(TypedDict, total=False):
@@ -76,13 +83,11 @@ YDL_OPTS: YdlOpts = {
     "progress": True,  # Afficher une barre de progression
     # Évite qu'une vidéo indisponible fasse échouer toute la playlist.
     "ignoreerrors": True,
-    
     # Limiteur des impacts de rate-limit YouTube en espacant les requêtes.
     # "sleep_before_extractor": 1,
     # "sleep_interval_requests": 2,
     # "sleep_interval": 2,
     # "max_sleep_interval": 6,
-    
     # Réessaie automatiquement en cas d'échec temporaire côté YouTube.
     "retries": 5,
     "extractor_retries": 5,
@@ -278,7 +283,6 @@ def zzzdisplay_videos_table(df):
     headers = ["Date", "Titre", "Durée"]
 
     # Afficher le tableau
-    print("\n=== Liste des vidéos de Kevin Degila ===")
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
 
@@ -514,9 +518,25 @@ def format_remaining_time_fr(total_minutes):
 
 def toSeeToBp(df):
     """Construit le markdown des videos et l'ecrit dans le dossier cache."""
+
+    # print(f'{len(df) = }') # //2ar
+
+    nb_videos = len(df)
+    nb_videos_txt = str(nb_videos) + " video" + ("s" if len(df) > 1 else "")
+    total_duration = 777
+
+
+    # stats = df.agg({"duration": ["min", "max", "mean", 'sum']})
+    # print(stats)
+    # print(stats.at['sum', 'duration'])
+    total_duration = format_remaining_time_fr(df['duration'].sum()//60)
+    # print(total_duration)
+    
     md = ""
     md = "# BP Learning - Vidéos à voir\n\n"
-    md += f"## Auteur {AUTHOR}\n\n"
+    md += f"## Auteur **[{AUTHOR}]({url})** ({nb_videos_txt} - {total_duration})\n\n"
+    print(md)
+
 
     for _, row in df.iterrows():
         md += (
@@ -584,7 +604,9 @@ if __name__ == "__main__":
 
     # Obtenir et trier le dataset
     df = videos_to_see()
+
     md = toSeeToBp(df)
+
     # Afficher le tableau
     # zzzdisplay_videos_table(df)
 

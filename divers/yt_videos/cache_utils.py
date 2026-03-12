@@ -87,7 +87,9 @@ def write_videos_cache(
 
         if timestamp_formatter is not None:
             payload["timestamp_fr"] = timestamp_formatter(now_ts)
-
+        
+        payload['nb_videos'] = len(videos)
+        
         cache_dir = os.path.dirname(cache_file)
         if cache_dir:
             os.makedirs(cache_dir, exist_ok=True)
