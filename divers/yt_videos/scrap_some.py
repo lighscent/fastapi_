@@ -4,32 +4,40 @@ import json
 import locale
 import os
 import time
+from typing import TYPE_CHECKING, TypedDict, cast
 from pymox_kit import *
 
 import yt_dlp
+from yt_dlp.utils import DownloadError
 
 
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
+
+if TYPE_CHECKING:
+    from yt_dlp.YoutubeDL import _Params
 
 # Pour mise au point du script
 # AUTHOR = "doro2255"  # 1 seule vidéo (7')
 # AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos (~12 - 1H30)
 # AUTHOR = "c57-u5s"  # 16 videos - 11 heures et 23 minutes
-# AUTHOR = "Alphorm"  # Limiteur necessaire
-# AUTHOR = "tseries"  # Très gros volume, limiter les requêtes
+# AUTHOR = "Alphorm"  # ❌ Limiteur necessaire
+# AUTHOR = "tseries"  # ❌ rès gros volume, limiter les requêtes
 
 # Initiation à Python (Bases)
 # AUTHOR = "Gravenilvectuto"  # 174 videos - 49 heures et 39 minutes
 # AUTHOR = "CodeAvecJonathan"  # 10 videos - 15 heures et 16 minutes
-# AUTHOR = "hassanbahi"  # 843 vidéos
+# AUTHOR = "hassanbahi"  # ❌ 843 vidéos
 
 # Python approfondi
-# AUTHOR = "donaldprogrammeur"  # Des bases à DevOps (424 vidéos)
+# AUTHOR = "donaldprogrammeur"  # ❌ Des bases à DevOps (424 vidéos)
 
 # Python pour l'IA
-AUTHOR = "KevinDegila"  # 262 videos - 53 heures et 38 minutes
-# AUTHOR = "InformatiqueSansComplexe"
-# AUTHOR = "MachineLearnia"
+# AUTHOR = "KevinDegila"  # 262 videos - 53 heures et 38 minutes
+# AUTHOR = "InformatiqueSansComplexe" ❌ 
+# AUTHOR = "MachineLearnia"❌
+
+# AUTHOR = "tseries"
+AUTHOR = "KevinDegila"
 
 URL = f"https://www.youtube.com/@{AUTHOR}/videos"
 
@@ -44,7 +52,18 @@ _cache_utils_module = import_module(
 )
 get_valid_cache_entry = _cache_utils_module.get_valid_cache_entry
 
-YDL_OPTS_LIST = {
+
+class YdlOpts(TypedDict, total=False):
+    extract_flat: bool
+    quiet: bool
+    ignoreerrors: bool
+    retries: int
+    extractor_retries: int
+    progress: bool
+    check_formats: bool
+
+
+YDL_OPTS_LIST: YdlOpts = {
     "extract_flat": True,
     "quiet": False,
     "ignoreerrors": True,
@@ -52,14 +71,22 @@ YDL_OPTS_LIST = {
     "extractor_retries": 2,
 }
 
-YDL_OPTS_DETAIL = {
+YDL_OPTS_DETAIL: YdlOpts = {
     "extract_flat": False,
     "quiet": False,
     "progress": True,  # Afficher une barre de progression
     "ignoreerrors": True,
     "retries": 3,
     "extractor_retries": 3,
+    "check_formats": False,
 }
+
+MAX_CUMULATED_403_ERRORS = 7
+
+
+def is_http_403_error(exc):
+    msg = str(exc).lower()
+    return "403" in msg and ("http error" in msg or "forbidden" in msg)
 
 
 def timestamp2fr(ts: float) -> str:
@@ -206,18 +233,17 @@ def write_markdown(videos):
     print(f"Fichier markdown généré : {OUTPUT_MD_FILE}")
 
 
-def write_result(videos, der_id, total_playlist):
+def write_result(videos, total_playlist):
     os.makedirs(STORAGE_DIR, exist_ok=True)
     now_ts = time.time()
-    scrapees = len(videos)
+    scraped = len(videos)
     payload = {
-        "videos": videos,
         "url": URL,
         "timestamp": now_ts,
         "timestamp_fr": timestamp2fr(now_ts),
-        "scrapees": scrapees,
+        "scraped": scraped,
         "total_playlist": total_playlist,
-        "der_id": der_id,
+        "videos": videos,
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -226,17 +252,16 @@ def write_result(videos, der_id, total_playlist):
 
 def read_previous_result():
     if not os.path.isfile(OUTPUT_FILE):
-        return [], None
+        return []
 
     try:
         with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         videos = data.get("videos") if isinstance(data.get("videos"), list) else []
-        der_id = data.get("der_id") if isinstance(data.get("der_id"), str) else None
-        return videos, der_id
+        return videos
     except Exception:
-        return [], None
+        return []
 
 
 def read_previous_counts():
@@ -248,22 +273,22 @@ def read_previous_counts():
         with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        scrapees = data.get("scrapees") if isinstance(data.get("scrapees"), int) else None
+        scraped = data.get("scraped") if isinstance(data.get("scraped"), int) else None
         total_playlist = (
             data.get("total_playlist")
             if isinstance(data.get("total_playlist"), int)
             else None
         )
-        return scrapees, total_playlist
+        return scraped, total_playlist
     except Exception:
         return None, None
 
 
-def get_simulated_failure_position(existing_scrapees):
+def get_simulated_failure_position(existing_scraped):
     """Retourne la position globale de panne simulée selon l'avancement."""
-    if existing_scrapees < 2:
+    if existing_scraped < 2:
         return 3
-    if existing_scrapees < 5:
+    if existing_scraped < 5:
         return 6
     return None
 
@@ -276,16 +301,16 @@ def scrap_some():
         cached_videos = cache_entry.get("videos")
         cache_date = cache_entry.get("timestamp_fr")
         remaining_minutes = cache_entry.get("remaining_minutes")
-        scrapees, total_playlist = read_previous_counts()
+        scraped, total_playlist = read_previous_counts()
         cache_is_complete = (
-            isinstance(scrapees, int)
+            isinstance(scraped, int)
             and isinstance(total_playlist, int)
-            and scrapees >= total_playlist
+            and scraped >= total_playlist
         )
 
-        if isinstance(scrapees, int) and isinstance(total_playlist, int) and not cache_is_complete:
+        if isinstance(scraped, int) and isinstance(total_playlist, int) and not cache_is_complete:
             print(
-                f"Cache valide mais incomplet ({scrapees}/{total_playlist}) : reprise du scraping pour combler les trous."
+                f"Cache valide mais incomplet ({scraped}/{total_playlist}) : reprise du scraping pour combler les trous."
             )
 
         if isinstance(cached_videos, list):
@@ -300,18 +325,16 @@ def scrap_some():
                 write_markdown(cached_videos)
                 return
 
-    videos, start_after_id = read_previous_result()
+    videos = read_previous_result()
     existing_ids = {v.get("id") for v in videos if isinstance(v, dict) and v.get("id")}
-    # existing_scrapees = len(videos)
-    # simulated_failure_position = get_simulated_failure_position(existing_scrapees)
+    # existing_scraped = len(videos)
+    # simulated_failure_position = get_simulated_failure_position(existing_scraped)
     # simulated_failure_position = None  # Simulation désactivée
-    der_id = start_after_id
     total_playlist = None
+    cumulated_403_errors = 0
 
-    if start_after_id:
-        print(
-            f"État précédent détecté (der_id={start_after_id}). Vérification complète des IDs pour combler les trous."
-        )
+    if videos:
+        print("État précédent détecté. Vérification complète des IDs pour combler les trous.")
     else:
         print("Aucun état précédent trouvé, démarrage depuis la première vidéo.")
 
@@ -323,7 +346,7 @@ def scrap_some():
     #     print("Aucune panne simulée: ce run doit aller jusqu'au bout.")
 
     try:
-        with yt_dlp.YoutubeDL(YDL_OPTS_LIST) as ydl_list:
+        with yt_dlp.YoutubeDL(cast("_Params", YDL_OPTS_LIST)) as ydl_list:
             playlist_infos = ydl_list.extract_info(URL, download=False)
             entries = playlist_infos.get("entries", [])
 
@@ -355,7 +378,7 @@ def scrap_some():
                 "Aucun trou détecté dans le cache pour les IDs connus de la playlist."
             )
 
-        with yt_dlp.YoutubeDL(YDL_OPTS_DETAIL) as ydl_detail:
+        with yt_dlp.YoutubeDL(cast("_Params", YDL_OPTS_DETAIL)) as ydl_detail:
             for idx, entry in enumerate(entries, start=1):
                 if not isinstance(entry, dict):
                     continue
@@ -380,7 +403,27 @@ def scrap_some():
                     f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécution n°{run_processed + 1}{R}"
                 )
 
-                video_detail = ydl_detail.extract_info(video_url, download=False)
+                try:
+                    video_detail = ydl_detail.extract_info(video_url, download=False)
+                except DownloadError as e:
+                    if is_http_403_error(e):
+                        cumulated_403_errors += 1
+                        print(
+                            f"{YELLOW}Erreur 403 cumulée {cumulated_403_errors}/{MAX_CUMULATED_403_ERRORS} sur {video_url}{R}"
+                        )
+                        if cumulated_403_errors >= MAX_CUMULATED_403_ERRORS:
+                            print(
+                                f"{RED}Seuil de 403 atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
+                            )
+                            break
+                        continue
+
+                    print(f"Erreur yt-dlp ignorée sur {video_url}: {e}")
+                    continue
+                except Exception as e:
+                    print(f"Erreur lors du détail pour {video_url}: {e}")
+                    continue
+
                 if not isinstance(video_detail, dict):
                     continue
 
@@ -393,22 +436,17 @@ def scrap_some():
                     existing_ids.add(video_id)
                 run_processed += 1
 
-        # der_id doit rester le dernier ID de la playlist (pas le dernier ajouté),
-        # pour conserver une métadonnée stable même en mode rattrapage de trous.
-        if playlist_ids:
-            der_id = playlist_ids[-1]
-
     except Exception as e:
         print(f"Scrap interrompu: {e}")
 
     videos = sorted(videos, key=video_sort_key, reverse=True)
-    write_result(videos=videos, der_id=der_id, total_playlist=total_playlist)
+    write_result(videos=videos, total_playlist=total_playlist)
     write_markdown(videos)
-    scrapees = len(videos)
-    complete = isinstance(total_playlist, int) and total_playlist == scrapees
+    scraped = len(videos)
+    complete = isinstance(total_playlist, int) and total_playlist == scraped
     print(f"Fichier JSON écrit: {OUTPUT_FILE}")
-    print(f"scrapees={scrapees}, total_playlist={total_playlist}, complete={complete}")
-    print(f"der_id={der_id}")
+    print(f"scraped={scraped}, total_playlist={total_playlist}, complete={complete}")
+    print(f"403 cumulées sur ce run: {cumulated_403_errors}")
 
 
 if __name__ == "__main__":

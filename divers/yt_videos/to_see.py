@@ -3,6 +3,7 @@ import json, locale, os, time, yt_dlp
 from importlib import import_module
 import pandas as pd
 from typing import TYPE_CHECKING, TypedDict, cast
+from yt_dlp.utils import DownloadError
 from pymox_kit import *
 
 _cache_utils_module = import_module(
@@ -94,6 +95,14 @@ YDL_OPTS: YdlOpts = {
     "retries": 5,
     "extractor_retries": 5,
 }
+
+MAX_CUMULATED_403_ERRORS = 7
+
+
+def is_http_403_error(exc: Exception) -> bool:
+    """Détecte une erreur HTTP 403 dans les exceptions yt-dlp."""
+    msg = str(exc).lower()
+    return "403" in msg and ("http error" in msg or "forbidden" in msg)
 
 
 def zzzfetch_and_save_videos():
@@ -436,26 +445,55 @@ def timestamp2fr(ts, long="court") -> str:
 def fetch_latest_videos():
     """Récupère les vidéos depuis YouTube et retourne un DataFrame."""
 
-    print("Étape 1/2 (Mise à jour) : Récupération de la liste de toutes les vidéos...")
+    print("Étape 1/2 : Récupération de la liste des vidéos...")
+    ydl_opts_flat = dict(YDL_OPTS)
+    ydl_opts_flat["extract_flat"] = True
+
     try:
-        with yt_dlp.YoutubeDL(cast("_Params", YDL_OPTS)) as ydl:
+        with yt_dlp.YoutubeDL(cast("_Params", ydl_opts_flat)) as ydl:
             playlist_infos = ydl.extract_info(url, download=False)
             video_entries = playlist_infos.get("entries", [])
-            total_videos_global = len(video_entries)
-            videos = []
-            skipped_entries = 0
+    except Exception as e:
+        print(f"Erreur lors de la récupération de la liste des vidéos: {e}")
+        return None, False
 
-            for v in video_entries:
+    total_videos_global = len(video_entries)
+    print(
+        f"{total_videos_global} vidéo{'s' if total_videos_global>1 else ''} trouvées dans la playlist de {AUTHOR}"
+    )
+
+    if not video_entries:
+        return [], True
+
+    print("Étape 2/2 : Récupération des détails vidéo par vidéo...")
+    videos = []
+    skipped_entries = 0
+    cumulated_403_errors = 0
+
+    ydl_opts_detail = dict(YDL_OPTS)
+    ydl_opts_detail["extract_flat"] = False
+
+    with yt_dlp.YoutubeDL(cast("_Params", ydl_opts_detail)) as ydl:
+        for i, entry in enumerate(video_entries, start=1):
+            if not isinstance(entry, dict):
+                skipped_entries += 1
+                continue
+
+            video_url = entry.get("url") or entry.get("webpage_url")
+            if not video_url:
+                skipped_entries += 1
+                continue
+
+            try:
+                v = ydl.extract_info(video_url, download=False)
                 if not isinstance(v, dict):
                     skipped_entries += 1
                     continue
 
                 date = extract_video_datetime(v)
-
                 videos.append(
                     {
                         "titre": v.get("title"),
-                        # "description": v.get("description"),
                         "date": v.get("upload_date"),
                         "date_epoch": v.get("epoch"),
                         "date_epoch_fr": timestamp2fr(v.get("epoch")),
@@ -474,18 +512,39 @@ def fetch_latest_videos():
                     }
                 )
 
-            print(
-                f"{total_videos_global} vidéo{'s' if total_videos_global>1 else ''} trouvées dans la playlist de {AUTHOR}"
-            )
-            if skipped_entries:
-                print(
-                    f"{skipped_entries} entrée(s) ignorée(s) (vidéo indisponible / erreur récupérable)."
-                )
-            return videos, True
+                if i % 100 == 0:
+                    print(
+                        f"Progression détails: {i}/{total_videos_global} | OK={len(videos)} | 403={cumulated_403_errors}"
+                    )
 
-    except Exception as e:
-        print(f"Erreur lors de la récupération de la liste des vidéos: {e}")
-        return None, False
+            except DownloadError as e:
+                if is_http_403_error(e):
+                    cumulated_403_errors += 1
+                    print(
+                        f"Erreur 403 ({cumulated_403_errors}/{MAX_CUMULATED_403_ERRORS}) sur {video_url}"
+                    )
+                    if cumulated_403_errors >= MAX_CUMULATED_403_ERRORS:
+                        print(
+                            "Seuil de 403 atteint. Arrêt anticipé du scraping des détails."
+                        )
+                        break
+                else:
+                    skipped_entries += 1
+                    print(f"Erreur de téléchargement ignorée pour {video_url}: {e}")
+            except Exception as e:
+                skipped_entries += 1
+                print(f"Erreur lors de la récupération des détails pour {video_url}: {e}")
+
+            time.sleep(0.2)
+
+    if skipped_entries:
+        print(
+            f"{skipped_entries} entrée(s) ignorée(s) (vidéo indisponible / erreur récupérable)."
+        )
+    print(
+        f"Détails récupérés : {len(videos)} vidéo{'s' if len(videos)>1 else ''}."
+    )
+    return videos, True
 
     # with yt_dlp.YoutubeDL(ydl_opts) as ydl:
     #     info = ydl.extract_info(url, download=False)
