@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 # Python pour l'IA
 # AUTHOR = "KevinDegila"  # 262 videos - 53 heures et 38 minutes
-# AUTHOR = "InformatiqueSansComplexe" ❌ 
+# AUTHOR = "InformatiqueSansComplexe" ❌
 # AUTHOR = "MachineLearnia"❌
 
 # AUTHOR = "tseries"
@@ -400,7 +400,7 @@ def scrap_some():
                     continue
 
                 print(
-                    f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécution n°{run_processed + 1}{R}"
+                    f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécutées :  {SB}{run_processed + 1} ( {(run_processed +1) / len(missing_in_cache) * 100:.1f} % ) {R}"
                 )
 
                 try:
