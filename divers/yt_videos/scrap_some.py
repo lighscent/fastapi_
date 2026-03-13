@@ -34,8 +34,8 @@ if TYPE_CHECKING:
 # AUTHOR = "doro2255"                 #   1 seule vidéo (7')
 # AUTHOR = "LionelCOTE"               #  Pour mise au point car peu de vidéos (12 - 1H27)
 # AUTHOR = "c57-u5s"                  #  16 videos - 11 heures et 23 minutes
-# AUTHOR = "Alphorm"                  # Extrême  - 4 064 vidéos - ❌ - Diverses notions liées à l'informatique
-# AUTHOR = "tseries"                  # Top Extrême - 23 458 vidéos - ❌ - Compte qui génère le + de gains au Monde avec YT !❌
+# AUTHOR = "Alphorm"                  # Extrême  - 4064 videos - 665 heures et 3 minutes - Diverses notions liées à l'informatique
+# AUTHOR = "tseries"                  # Top Extrême - 23 458 vidéos - ❌ - Compte qui génère le + de gains au Monde avec YT !
 
 # Initiation à Python (Bases)
 # AUTHOR = "CodeAvecJonathan"         #  10 videos -  15 heures et 16 minutes
