@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 # AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos (~12 - 1H30)
 # AUTHOR = "c57-u5s"  # 16 videos - 11 heures et 23 minutes
 # AUTHOR = "Alphorm"  # ❌ Limiteur necessaire
-# AUTHOR = "tseries"  # ❌ rès gros volume, limiter les requêtes
+# AUTHOR = "tseries"  # 25456 vidéos ❌
 
 # Initiation à Python (Bases)
 # AUTHOR = "Gravenilvectuto"  # 174 videos - 49 heures et 39 minutes
@@ -36,8 +36,8 @@ if TYPE_CHECKING:
 # AUTHOR = "InformatiqueSansComplexe" ❌
 # AUTHOR = "MachineLearnia"❌
 
-# AUTHOR = "tseries"
 AUTHOR = "KevinDegila"
+AUTHOR = "tseries"
 
 URL = f"https://www.youtube.com/@{AUTHOR}/videos"
 
@@ -61,6 +61,7 @@ class YdlOpts(TypedDict, total=False):
     extractor_retries: int
     progress: bool
     check_formats: bool
+    logger: object
 
 
 YDL_OPTS_LIST: YdlOpts = {
@@ -84,9 +85,67 @@ YDL_OPTS_DETAIL: YdlOpts = {
 MAX_CUMULATED_403_ERRORS = 7
 
 
-def is_http_403_error(exc):
+def is_counted_ytdlp_error(exc):
     msg = str(exc).lower()
-    return "403" in msg and ("http error" in msg or "forbidden" in msg)
+    is_403 = "403" in msg and ("http error" in msg or "forbidden" in msg)
+    is_rate_limited = (
+        "rate-limited" in msg
+        or "rate limited" in msg
+        or "current session has been rate-limited" in msg
+        or "this content isn't available, try again later" in msg
+    )
+    return is_403 or is_rate_limited
+
+
+class CountedErrorTracker:
+    """Compteur d'erreurs 403/rate-limit avec anti double-comptage immédiat."""
+
+    def __init__(self, threshold):
+        self.threshold = threshold
+        self.count = 0
+        self.stop_requested = False
+        self._last_signature = None
+
+    def increment(self, message, url=None, source="logger"):
+        signature = (str(message).strip().lower(), str(url or ""), source)
+        if signature == self._last_signature:
+            return
+        self._last_signature = signature
+
+        self.count += 1
+        print(
+            f"{YELLOW}Erreur cumulée (403/rate-limit) {self.count}/{self.threshold} [{source}] {url or ''}{R}"
+        )
+        if self.count >= self.threshold:
+            self.stop_requested = True
+
+    def progress_suffix(self):
+        return f"| {YELLOW}403/rate-limit : {self.count}/{self.threshold}{R}"
+
+
+class YtDlpCountedErrorLogger:
+    """Logger yt-dlp: relaie les logs et compte les erreurs ciblées."""
+
+    def __init__(self, tracker):
+        self.tracker = tracker
+
+    def _handle(self, msg, level):
+        text = str(msg)
+        print(text)
+        if is_counted_ytdlp_error(text):
+            self.tracker.increment(text, source=f"log:{level}")
+
+    def debug(self, msg):
+        self._handle(msg, "debug")
+
+    def info(self, msg):
+        self._handle(msg, "info")
+
+    def warning(self, msg):
+        self._handle(msg, "warning")
+
+    def error(self, msg):
+        self._handle(msg, "error")
 
 
 def timestamp2fr(ts: float) -> str:
@@ -331,7 +390,7 @@ def scrap_some():
     # simulated_failure_position = get_simulated_failure_position(existing_scraped)
     # simulated_failure_position = None  # Simulation désactivée
     total_playlist = None
-    cumulated_403_errors = 0
+    error_tracker = CountedErrorTracker(MAX_CUMULATED_403_ERRORS)
 
     if videos:
         print("État précédent détecté. Vérification complète des IDs pour combler les trous.")
@@ -378,8 +437,17 @@ def scrap_some():
                 "Aucun trou détecté dans le cache pour les IDs connus de la playlist."
             )
 
-        with yt_dlp.YoutubeDL(cast("_Params", YDL_OPTS_DETAIL)) as ydl_detail:
+        ydl_opts_detail = dict(YDL_OPTS_DETAIL)
+        ydl_opts_detail["logger"] = YtDlpCountedErrorLogger(error_tracker)
+
+        with yt_dlp.YoutubeDL(cast("_Params", ydl_opts_detail)) as ydl_detail:
             for idx, entry in enumerate(entries, start=1):
+                if error_tracker.stop_requested:
+                    print(
+                        f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
+                    )
+                    break
+
                 if not isinstance(entry, dict):
                     continue
 
@@ -400,20 +468,17 @@ def scrap_some():
                     continue
 
                 print(
-                    f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécutées :  {SB}{run_processed + 1} ( {(run_processed +1) / len(missing_in_cache) * 100:.1f} % ) {R}"
+                    f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécutées : {SB}{run_processed + 1} ( {(run_processed +1) / len(missing_in_cache) * 100:.1f} % ) {R} {error_tracker.progress_suffix()}"
                 )
 
                 try:
                     video_detail = ydl_detail.extract_info(video_url, download=False)
                 except DownloadError as e:
-                    if is_http_403_error(e):
-                        cumulated_403_errors += 1
-                        print(
-                            f"{YELLOW}Erreur 403 cumulée {cumulated_403_errors}/{MAX_CUMULATED_403_ERRORS} sur {video_url}{R}"
-                        )
-                        if cumulated_403_errors >= MAX_CUMULATED_403_ERRORS:
+                    if is_counted_ytdlp_error(e):
+                        error_tracker.increment(str(e), url=video_url, source="exception")
+                        if error_tracker.stop_requested:
                             print(
-                                f"{RED}Seuil de 403 atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
+                                f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
                             )
                             break
                         continue
@@ -421,8 +486,23 @@ def scrap_some():
                     print(f"Erreur yt-dlp ignorée sur {video_url}: {e}")
                     continue
                 except Exception as e:
+                    if is_counted_ytdlp_error(e):
+                        error_tracker.increment(str(e), url=video_url, source="exception")
+                        if error_tracker.stop_requested:
+                            print(
+                                f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
+                            )
+                            break
+                        continue
+
                     print(f"Erreur lors du détail pour {video_url}: {e}")
                     continue
+
+                if error_tracker.stop_requested:
+                    print(
+                        f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
+                    )
+                    break
 
                 if not isinstance(video_detail, dict):
                     continue
@@ -446,7 +526,7 @@ def scrap_some():
     complete = isinstance(total_playlist, int) and total_playlist == scraped
     print(f"Fichier JSON écrit: {OUTPUT_FILE}")
     print(f"scraped={scraped}, total_playlist={total_playlist}, complete={complete}")
-    print(f"403 cumulées sur ce run: {cumulated_403_errors}")
+    print(f"Erreurs cumulées (403/rate-limit) sur ce run: {error_tracker.count}")
 
 
 if __name__ == "__main__":
