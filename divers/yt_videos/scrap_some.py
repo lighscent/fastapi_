@@ -5,45 +5,60 @@ import locale
 import os
 import time
 from typing import TYPE_CHECKING, TypedDict, cast
-from pymox_kit import *
 
 import yt_dlp
 from yt_dlp.utils import DownloadError
 
+# ❌ Compatibilité de PyMoX-Kit avec Linux (Cf. GH spaces)
+from pymox_kit import *
 
+
+# try:
+#     from pymox_kit import cls, end
+# except Exception:
+#     # Fallback minimal si pymox_kit échoue (ex: locale fr_FR absente).
+#     def cls():
+#         import subprocess
+
+#         try:
+#             subprocess.run(["clear"], check=False)
+#         except Exception:
+#             print("\033[2J\033[H", end="")
+
+# ❌ Loker ce qui n'a pas été refait ici et redonner le nom to_see à ce script
+
+# ❌ ⚠️ Cf si locale marche en linux
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 
 if TYPE_CHECKING:
     from yt_dlp.YoutubeDL import _Params
 
 # Pour mise au point du script
-# AUTHOR = "doro2255"  # 1 seule vidéo (7')
-# AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos (~12 - 1H30)
-# AUTHOR = "c57-u5s"  # 16 videos - 11 heures et 23 minutes
-# AUTHOR = "Alphorm"  # ❌ Limiteur necessaire
-# AUTHOR = "tseries"  # 25456 vidéos ❌
+# AUTHOR = "doro2255"                 # 1 seule vidéo (7')
+# AUTHOR = "LionelCOTE"               # Pour mise au point car peu de vidéos (12 - 1H27)
+# AUTHOR = "c57-u5s"                  # 16 videos - 11 heures et 23 minutes
+# AUTHOR = "Alphorm"                  #  4 064 vidéos - ❌
+# AUTHOR = "tseries"                  # 23 458 vidéos - ❌
 
 # Initiation à Python (Bases)
-# AUTHOR = "Gravenilvectuto"  # 174 videos - 49 heures et 39 minutes
-# AUTHOR = "CodeAvecJonathan"  # 10 videos - 15 heures et 16 minutes
-# AUTHOR = "hassanbahi"  # ❌ 843 vidéos
+# AUTHOR = "CodeAvecJonathan"         #  10 videos -  15 heures et 16 minutes
+# AUTHOR = "Gravenilvectuto"          # 174 videos -  49 heures et 39 minutes
+# AUTHOR = "hassanbahi"               # 843 vidéos - 191 heures et 13 minutes - Top pour comprendre super bien les bases - Attention: Pas mal de vidéos + anciennes avec le langage C, mais facielement adaptable... D'ailleurs, c 1 super exo ;-) !
 
 # Python approfondi
-# AUTHOR = "donaldprogrammeur"  # ❌ Des bases à DevOps (424 vidéos)
+# AUTHOR = "donaldprogrammeur"        # Des bases à DevOps (424 vidéos - 303 heures et 56 minutes)
 
 # Python pour l'IA
-# AUTHOR = "KevinDegila"  # 262 videos - 53 heures et 38 minutes
-# AUTHOR = "InformatiqueSansComplexe" ❌
-# AUTHOR = "MachineLearnia"❌
+# AUTHOR = "KevinDegila"              # 262 videos - 53 heures et 38 minutes
+AUTHOR = "InformatiqueSansComplexe" # 284 videos - 33 heures et 8 minutes
+# AUTHOR = "MachineLearnia"           #  65 videos - 22 heures et 53 minutes
 
-AUTHOR = "KevinDegila"
-AUTHOR = "tseries"
+# AUTHOR = "doro2255"                 # 1 seule vidéo (7')
 
 URL = f"https://www.youtube.com/@{AUTHOR}/videos"
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 STORAGE_DIR = os.path.join(SCRIPT_DIR, "cache")
-OUTPUT_FILE = os.path.join(STORAGE_DIR, f".{AUTHOR}_videos_scrap_some.json")
+OUTPUT_FILE = os.path.join(STORAGE_DIR, f".{AUTHOR}_videos.json")  # ❌ Simplify file name author_videos.json
 OUTPUT_MD_FILE = os.path.join(STORAGE_DIR, f"{AUTHOR}.md")
 CACHE_TTL = 3600  # 3600 = 1 heure - 86400 = 1 jour
 
@@ -83,6 +98,8 @@ YDL_OPTS_DETAIL: YdlOpts = {
 }
 
 MAX_CUMULATED_403_ERRORS = 7
+PAUSE_ON_RATE_LIMIT = 5  # secondes d'attente avant reprise automatique
+MAX_STALL_RETRIES = 3  # passes sans progression avant arrêt définitif
 
 
 def is_counted_ytdlp_error(exc):
@@ -103,6 +120,7 @@ class CountedErrorTracker:
     def __init__(self, threshold):
         self.threshold = threshold
         self.count = 0
+        self.total_count = 0
         self.stop_requested = False
         self._last_signature = None
 
@@ -113,11 +131,18 @@ class CountedErrorTracker:
         self._last_signature = signature
 
         self.count += 1
+        self.total_count += 1
         print(
             f"{YELLOW}Erreur cumulée (403/rate-limit) {self.count}/{self.threshold} [{source}] {url or ''}{R}"
         )
         if self.count >= self.threshold:
             self.stop_requested = True
+
+    def reset(self):
+        """Remet le compteur de passe à zéro (total_count conservé)."""
+        self.count = 0
+        self.stop_requested = False
+        self._last_signature = None
 
     def progress_suffix(self):
         return f"| {YELLOW}403/rate-limit : {self.count}/{self.threshold}{R}"
@@ -253,7 +278,7 @@ def format_remaining_time_fr(total_minutes):
     return " et ".join(parts)
 
 
-def write_markdown(videos):
+def write_markdown(videos, total_playlist=None):
     if not isinstance(videos, list):
         return
 
@@ -264,9 +289,13 @@ def write_markdown(videos):
     nb_videos_txt = f"**{len(videos)}** video{'s' if len(videos) > 1 else ''}"
 
     md = "# BP Learning - Vidéos à voir\n\n"
-    md += (
-        f"## Auteur **[{AUTHOR}]({URL})** ( {nb_videos_txt} - {total_duration_txt} )\n\n"
-    )
+    partiel_txt1 = ''
+    partiel_txt2 = ''
+    if isinstance(total_playlist, int) and len(videos) < total_playlist:
+        partiel_txt1 = f" ⚠️ PARTIEL → "
+        partiel_txt2 = f"/ **{total_playlist}** "
+
+    md += f"## Auteur **[{AUTHOR}]({URL})** ({partiel_txt1} {nb_videos_txt} {partiel_txt2}- {total_duration_txt} )\n\n"
 
     for video in videos:
         if not isinstance(video, dict):
@@ -367,7 +396,11 @@ def scrap_some():
             and scraped >= total_playlist
         )
 
-        if isinstance(scraped, int) and isinstance(total_playlist, int) and not cache_is_complete:
+        if (
+            isinstance(scraped, int)
+            and isinstance(total_playlist, int)
+            and not cache_is_complete
+        ):
             print(
                 f"Cache valide mais incomplet ({scraped}/{total_playlist}) : reprise du scraping pour combler les trous."
             )
@@ -381,19 +414,22 @@ def scrap_some():
                     print(
                         f"Dernière mise à jour: {cache_date} (prochaine actualisation dans environ {CYAN}{remaining_txt}{R})."
                     )
-                write_markdown(cached_videos)
+                print("Markdown non regénéré (cache TTL valide).")
                 return
 
     videos = read_previous_result()
+    initial_video_count = len(videos)
     existing_ids = {v.get("id") for v in videos if isinstance(v, dict) and v.get("id")}
     # existing_scraped = len(videos)
     # simulated_failure_position = get_simulated_failure_position(existing_scraped)
     # simulated_failure_position = None  # Simulation désactivée
-    total_playlist = None
+    _, total_playlist = read_previous_counts()  # récupère total connu pour la vérification de complétude
     error_tracker = CountedErrorTracker(MAX_CUMULATED_403_ERRORS)
 
     if videos:
-        print("État précédent détecté. Vérification complète des IDs pour combler les trous.")
+        print(
+            "État précédent détecté. Vérification complète des IDs pour combler les trous."
+        )
     else:
         print("Aucun état précédent trouvé, démarrage depuis la première vidéo.")
 
@@ -404,129 +440,171 @@ def scrap_some():
     # else:
     #     print("Aucune panne simulée: ce run doit aller jusqu'au bout.")
 
-    try:
-        with yt_dlp.YoutubeDL(cast("_Params", YDL_OPTS_LIST)) as ydl_list:
-            playlist_infos = ydl_list.extract_info(URL, download=False)
-            entries = playlist_infos.get("entries", [])
+    stall_retries = 0
+    scraped_before_pass = len(videos)
 
-        total_videos = playlist_infos.get("playlist_count")
-        total_playlist = total_videos if isinstance(total_videos, int) else None
-        total_videos_txt = (
-            str(total_videos)
-            if isinstance(total_videos, int)
-            else f"Nombre inconnu (au moins {len(entries)}) de"
+    def log_threshold_pause_message():
+        print(
+            f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Pause {PAUSE_ON_RATE_LIMIT}s puis reprise...{R}"
         )
-        print(f"{RED}{total_videos_txt} vidéos{R} trouvées dans la playlist.")
-        total_entries = len(entries)
-        run_processed = 0
-        playlist_ids = [
-            e.get("id")
-            for e in entries
-            if isinstance(e, dict) and isinstance(e.get("id"), str)
-        ]
-        missing_in_cache = [
-            video_id for video_id in playlist_ids if video_id not in existing_ids
-        ]
 
-        if missing_in_cache:
-            print(
-                f"{YELLOW}{len(missing_in_cache)} vidéo(s) absente(s) du cache seront (re)téléchargées.{R}"
+    def handle_detail_exception(exc, video_url, fallback_prefix):
+        if is_counted_ytdlp_error(exc):
+            error_tracker.increment(str(exc), url=video_url, source="exception")
+            if error_tracker.stop_requested:
+                log_threshold_pause_message()
+                return True
+            return False
+
+        print(f"{fallback_prefix} {video_url}: {exc}")
+        return False
+
+    while True:
+        # ── Vérification complétude avant chaque passe ──────────────────────
+        if isinstance(total_playlist, int) and len(videos) >= total_playlist:
+            break
+
+        try:
+            with yt_dlp.YoutubeDL(cast("_Params", YDL_OPTS_LIST)) as ydl_list:
+                playlist_infos = ydl_list.extract_info(URL, download=False)
+                entries = playlist_infos.get("entries", [])
+
+            total_videos = playlist_infos.get("playlist_count")
+            total_playlist = total_videos if isinstance(total_videos, int) else None
+            total_videos_txt = (
+                str(total_videos)
+                if isinstance(total_videos, int)
+                else f"Nombre inconnu (au moins {len(entries)}) de"
             )
-        else:
-            print(
-                "Aucun trou détecté dans le cache pour les IDs connus de la playlist."
-            )
+            print(f"{RED}{total_videos_txt} vidéos{R} trouvées dans la playlist.")
+            total_entries = len(entries)
+            run_processed = 0
+            playlist_ids = [
+                e.get("id")
+                for e in entries
+                if isinstance(e, dict) and isinstance(e.get("id"), str)
+            ]
+            missing_in_cache = [
+                video_id for video_id in playlist_ids if video_id not in existing_ids
+            ]
 
-        ydl_opts_detail = dict(YDL_OPTS_DETAIL)
-        ydl_opts_detail["logger"] = YtDlpCountedErrorLogger(error_tracker)
-
-        with yt_dlp.YoutubeDL(cast("_Params", ydl_opts_detail)) as ydl_detail:
-            for idx, entry in enumerate(entries, start=1):
-                if error_tracker.stop_requested:
-                    print(
-                        f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
-                    )
-                    break
-
-                if not isinstance(entry, dict):
-                    continue
-
-                current_id = entry.get("id")
-
-                # On saute immédiatement les vidéos déjà présentes dans le cache.
-                if isinstance(current_id, str) and current_id in existing_ids:
-                    continue
-
-                # Panne simulée progressive: 3e puis 6e, puis plus de panne.
-                # if simulated_failure_position is not None and idx == simulated_failure_position:
-                #     raise RuntimeError(
-                #         f"Erreur simulée sur la vidéo globale #{simulated_failure_position}"
-                #     )
-
-                video_url = entry.get("url") or entry.get("webpage_url")
-                if not video_url:
-                    continue
-
+            if missing_in_cache:
                 print(
-                    f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécutées : {SB}{run_processed + 1} ( {(run_processed +1) / len(missing_in_cache) * 100:.1f} % ) {R} {error_tracker.progress_suffix()}"
+                    f"{YELLOW}{len(missing_in_cache)} vidéo(s) absente(s) du cache seront (re)téléchargées.{R}"
                 )
+            else:
+                print(
+                    "Aucun trou détecté dans le cache pour les IDs connus de la playlist."
+                )
+                break
 
-                try:
-                    video_detail = ydl_detail.extract_info(video_url, download=False)
-                except DownloadError as e:
-                    if is_counted_ytdlp_error(e):
-                        error_tracker.increment(str(e), url=video_url, source="exception")
-                        if error_tracker.stop_requested:
-                            print(
-                                f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
-                            )
-                            break
+            ydl_opts_detail = dict(YDL_OPTS_DETAIL)
+            ydl_opts_detail["logger"] = YtDlpCountedErrorLogger(error_tracker)
+
+            with yt_dlp.YoutubeDL(cast("_Params", ydl_opts_detail)) as ydl_detail:
+                for idx, entry in enumerate(entries, start=1):
+                    if error_tracker.stop_requested:
+                        log_threshold_pause_message()
+                        break
+
+                    if not isinstance(entry, dict):
                         continue
 
-                    print(f"Erreur yt-dlp ignorée sur {video_url}: {e}")
-                    continue
-                except Exception as e:
-                    if is_counted_ytdlp_error(e):
-                        error_tracker.increment(str(e), url=video_url, source="exception")
-                        if error_tracker.stop_requested:
-                            print(
-                                f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
-                            )
-                            break
+                    current_id = entry.get("id")
+
+                    # On saute immédiatement les vidéos déjà présentes dans le cache.
+                    if isinstance(current_id, str) and current_id in existing_ids:
                         continue
 
-                    print(f"Erreur lors du détail pour {video_url}: {e}")
-                    continue
+                    video_url = entry.get("url") or entry.get("webpage_url")
+                    if not video_url:
+                        continue
 
-                if error_tracker.stop_requested:
                     print(
-                        f"{RED}Seuil d'erreurs 403/rate-limit atteint ({MAX_CUMULATED_403_ERRORS}). Arrêt anticipé du scrap détail.{R}"
+                        f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécutées : {SB}{run_processed} ( {(run_processed) / len(missing_in_cache) * 100:.1f} % ) {R}{error_tracker.progress_suffix()}"
                     )
-                    break
 
-                if not isinstance(video_detail, dict):
-                    continue
+                    try:
+                        video_detail = ydl_detail.extract_info(
+                            video_url, download=False
+                        )
+                    except DownloadError as e:
+                        if handle_detail_exception(e, video_url, "Erreur yt-dlp ignorée sur"):
+                            break
+                        continue
+                    except Exception as e:
+                        if handle_detail_exception(e, video_url, "Erreur lors du détail pour"):
+                            break
+                        continue
 
-                video = build_video_payload(video_detail)
-                video_id = video.get("id")
-                if video_id in existing_ids:
-                    continue
-                videos.append(video)
-                if video_id:
-                    existing_ids.add(video_id)
-                run_processed += 1
+                    if error_tracker.stop_requested:
+                        log_threshold_pause_message()
+                        break
 
-    except Exception as e:
-        print(f"Scrap interrompu: {e}")
+                    if not isinstance(video_detail, dict):
+                        continue
+
+                    video = build_video_payload(video_detail)
+                    video_id = video.get("id")
+                    if video_id in existing_ids:
+                        continue
+                    videos.append(video)
+                    if video_id:
+                        existing_ids.add(video_id)
+                    run_processed += 1
+
+        except Exception as e:
+            print(f"Scrap interrompu: {e}")
+
+        # ── Fin de passe: décider si on continue, on pause, ou on abandonne ──
+        scraped_now = len(videos)
+
+        if not error_tracker.stop_requested:
+            # Passe terminée normalement sans atteindre le seuil: on sort.
+            break
+
+        # Détection de stall: pas de progression sur cette passe
+        if scraped_now <= scraped_before_pass:
+            stall_retries += 1
+            print(
+                f"{RED}Aucune progression détectée (passe #{stall_retries}/{MAX_STALL_RETRIES}).{R}"
+            )
+            if stall_retries >= MAX_STALL_RETRIES:
+                print(
+                    f"{RED}Abandon définitif après {MAX_STALL_RETRIES} passes sans progression.{R}"
+                )
+                break
+        else:
+            stall_retries = 0
+
+        scraped_before_pass = scraped_now
+        error_tracker.reset()
+        # Sauvegarde de la progression avant la pause (persistance entre passes)
+        write_result(videos=sorted(videos, key=video_sort_key, reverse=True), total_playlist=total_playlist)
+        write_markdown(
+            sorted(videos, key=video_sort_key, reverse=True),
+            total_playlist=total_playlist,
+        )
+        print(f"JSON intermédiaire écrit ({scraped_now} vidéos).")
+        print(
+            f"{YELLOW}Pause {PAUSE_ON_RATE_LIMIT}s avant reprise (scraped={scraped_now}, total={total_playlist})...{R}"
+        )
+        # exit() # Pour tests sans attendre et redémarrer auto
+        time.sleep(PAUSE_ON_RATE_LIMIT)
 
     videos = sorted(videos, key=video_sort_key, reverse=True)
     write_result(videos=videos, total_playlist=total_playlist)
-    write_markdown(videos)
+    if len(videos) != initial_video_count:
+        write_markdown(videos, total_playlist=total_playlist)
+    else:
+        print("Markdown non regénéré (aucun changement détecté).")
     scraped = len(videos)
     complete = isinstance(total_playlist, int) and total_playlist == scraped
     print(f"Fichier JSON écrit: {OUTPUT_FILE}")
     print(f"scraped={scraped}, total_playlist={total_playlist}, complete={complete}")
-    print(f"Erreurs cumulées (403/rate-limit) sur ce run: {error_tracker.count}")
+    print(
+        f"Erreurs cumulées (403/rate-limit) total toutes passes: {error_tracker.total_count}"
+    )
 
 
 if __name__ == "__main__":

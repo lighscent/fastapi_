@@ -580,7 +580,7 @@ def format_remaining_time_fr(total_minutes):
 def toSeeToBp(df):
     """Construit le markdown des videos et l'ecrit dans le dossier cache."""
 
-    # print(f'{len(df) = }') # //2ar
+    # //2ar print(f'{len(df) = }') 
 
     nb_videos = len(df)
     nb_videos_txt = str(nb_videos) + " video" + ("s" if len(df) > 1 else "")
