@@ -27,7 +27,7 @@ locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 # AUTHOR = "donaldprogrammeur"  # Des bases à DevOps (424 vidéos)
 
 # Python pour l'IA
-AUTHOR = "KevinDegila"  # 262 vidéos
+AUTHOR = "KevinDegila"  # 262 videos - 53 heures et 38 minutes
 # AUTHOR = "InformatiqueSansComplexe"
 # AUTHOR = "MachineLearnia"
 
@@ -175,11 +175,11 @@ def write_markdown(videos):
         int(v.get("duration") or 0) for v in videos if isinstance(v, dict)
     )
     total_duration_txt = format_remaining_time_fr(total_duration_seconds // 60)
-    nb_videos_txt = f"{len(videos)} video{'s' if len(videos) > 1 else ''}"
+    nb_videos_txt = f"**{len(videos)}** video{'s' if len(videos) > 1 else ''}"
 
     md = "# BP Learning - Vidéos à voir\n\n"
     md += (
-        f"## Auteur **[{AUTHOR}]({URL})** ({nb_videos_txt} - {total_duration_txt})\n\n"
+        f"## Auteur **[{AUTHOR}]({URL})** ( {nb_videos_txt} - {total_duration_txt} )\n\n"
     )
 
     for video in videos:

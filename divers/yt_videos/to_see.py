@@ -49,8 +49,9 @@ AUTHOR = "doro2255"   # 1 seule vidéo (7')
 # AUTHOR = "InformatiqueSansComplexe"
 # AUTHOR = "MachineLearnia"
 
-AUTHOR = "LionelCOTE"  # Pour mise au point car peu de vidéos (~12 - 1H30)
-AUTHOR = "KevinDegila"  # 262 vidéos -
+AUTHOR = "LionelCOTE"
+AUTHOR = "KevinDegila"
+AUTHOR = "tseries"
 
 url = f"https://www.youtube.com/@{AUTHOR}/videos"
 
