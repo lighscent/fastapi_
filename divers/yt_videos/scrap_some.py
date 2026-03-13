@@ -1,9 +1,6 @@
 from datetime import datetime
 from importlib import import_module
-import json
-import locale
-import os
-import time
+import json, locale, os, sys, time
 from typing import TYPE_CHECKING, TypedDict, cast
 
 import yt_dlp
@@ -34,11 +31,11 @@ if TYPE_CHECKING:
     from yt_dlp.YoutubeDL import _Params
 
 # Pour mise au point du script
-# AUTHOR = "doro2255"                 # 1 seule vidéo (7')
-# AUTHOR = "LionelCOTE"               # Pour mise au point car peu de vidéos (12 - 1H27)
-# AUTHOR = "c57-u5s"                  # 16 videos - 11 heures et 23 minutes
-# AUTHOR = "Alphorm"                  #  4 064 vidéos - ❌
-# AUTHOR = "tseries"                  # 23 458 vidéos - ❌
+# AUTHOR = "doro2255"                 #   1 seule vidéo (7')
+# AUTHOR = "LionelCOTE"               #  Pour mise au point car peu de vidéos (12 - 1H27)
+# AUTHOR = "c57-u5s"                  #  16 videos - 11 heures et 23 minutes
+# AUTHOR = "Alphorm"                  # Extrême  - 4 064 vidéos - ❌ - Diverses notions liées à l'informatique
+# AUTHOR = "tseries"                  # Top Extrême - 23 458 vidéos - ❌ - Compte qui génère le + de gains au Monde avec YT !❌
 
 # Initiation à Python (Bases)
 # AUTHOR = "CodeAvecJonathan"         #  10 videos -  15 heures et 16 minutes
@@ -50,15 +47,21 @@ if TYPE_CHECKING:
 
 # Python pour l'IA
 # AUTHOR = "KevinDegila"              # 262 videos - 53 heures et 38 minutes
-AUTHOR = "InformatiqueSansComplexe" # 284 videos - 33 heures et 8 minutes
+# AUTHOR = "InformatiqueSansComplexe" # 284 videos - 33 heures et 8 minutes
 # AUTHOR = "MachineLearnia"           #  65 videos - 22 heures et 53 minutes
 
-# AUTHOR = "doro2255"                 # 1 seule vidéo (7')
+# AUTHOR = "doro2255"                 #   1 seule vidéo (7') # Garde fou !
+
+if "AUTHOR" not in globals():
+    sys.exit(f"{RED}AUTHOR n'est pas défini. Arrêt du script.{R}")
+
 
 URL = f"https://www.youtube.com/@{AUTHOR}/videos"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 STORAGE_DIR = os.path.join(SCRIPT_DIR, "cache")
-OUTPUT_FILE = os.path.join(STORAGE_DIR, f".{AUTHOR}_videos.json")  # ❌ Simplify file name author_videos.json
+OUTPUT_FILE = os.path.join(
+    STORAGE_DIR, f".{AUTHOR}_videos.json"
+)  # ❌ Simplify file name author_videos.json
 OUTPUT_MD_FILE = os.path.join(STORAGE_DIR, f"{AUTHOR}.md")
 CACHE_TTL = 3600  # 3600 = 1 heure - 86400 = 1 jour
 
@@ -289,8 +292,8 @@ def write_markdown(videos, total_playlist=None):
     nb_videos_txt = f"**{len(videos)}** video{'s' if len(videos) > 1 else ''}"
 
     md = "# BP Learning - Vidéos à voir\n\n"
-    partiel_txt1 = ''
-    partiel_txt2 = ''
+    partiel_txt1 = ""
+    partiel_txt2 = ""
     if isinstance(total_playlist, int) and len(videos) < total_playlist:
         partiel_txt1 = f" ⚠️ PARTIEL → "
         partiel_txt2 = f"/ **{total_playlist}** "
@@ -423,7 +426,9 @@ def scrap_some():
     # existing_scraped = len(videos)
     # simulated_failure_position = get_simulated_failure_position(existing_scraped)
     # simulated_failure_position = None  # Simulation désactivée
-    _, total_playlist = read_previous_counts()  # récupère total connu pour la vérification de complétude
+    _, total_playlist = (
+        read_previous_counts()
+    )  # récupère total connu pour la vérification de complétude
     error_tracker = CountedErrorTracker(MAX_CUMULATED_403_ERRORS)
 
     if videos:
@@ -529,11 +534,15 @@ def scrap_some():
                             video_url, download=False
                         )
                     except DownloadError as e:
-                        if handle_detail_exception(e, video_url, "Erreur yt-dlp ignorée sur"):
+                        if handle_detail_exception(
+                            e, video_url, "Erreur yt-dlp ignorée sur"
+                        ):
                             break
                         continue
                     except Exception as e:
-                        if handle_detail_exception(e, video_url, "Erreur lors du détail pour"):
+                        if handle_detail_exception(
+                            e, video_url, "Erreur lors du détail pour"
+                        ):
                             break
                         continue
 
@@ -580,7 +589,10 @@ def scrap_some():
         scraped_before_pass = scraped_now
         error_tracker.reset()
         # Sauvegarde de la progression avant la pause (persistance entre passes)
-        write_result(videos=sorted(videos, key=video_sort_key, reverse=True), total_playlist=total_playlist)
+        write_result(
+            videos=sorted(videos, key=video_sort_key, reverse=True),
+            total_playlist=total_playlist,
+        )
         write_markdown(
             sorted(videos, key=video_sort_key, reverse=True),
             total_playlist=total_playlist,
