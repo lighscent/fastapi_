@@ -1,7 +1,7 @@
 # Introduction à FastAPI
 
 Aujourd’hui c'est quoi FastAPI ?
-FastAPI est un framework web moderne et ultra performant conçu pour créer des API RESTful avec Python, à partir de la version 3.62. Voici ce qui le rend si spécial :
+FastAPI est un framework web moderne et ultra performant conçu pour créer des API RESTful avec Python, à partir de la version 3.6.2. Voici ce qui le rend si spécial :
 
 ## ⚡️ Caractéristiques principales
 **Rapidité** : Comparable à Node.js ou Go grâce à son architecture basée sur Starlette pour le serveur web et Pydantic pour la validation des données.
