@@ -45,12 +45,20 @@ AUTHOR = "tseries"                  # Top Extrême - 23 458 vidéos - ❌ - Comp
 # Python approfondi
 # AUTHOR = "donaldprogrammeur"        # Des bases à DevOps (424 vidéos - 303 heures et 56 minutes)
 
+
+# Python - FastAPI
+
+# AUTHOR = "DataAvecJB"               # Les bases
+AUTHOR = "bandedecodeurs"           # Les bases
+AUTHOR = "MasteringAI-q9g"          # Les bases
+
+
 # Python pour l'IA
 # AUTHOR = "KevinDegila"              # 262 videos - 53 heures et 38 minutes
 # AUTHOR = "InformatiqueSansComplexe" # 284 videos - 33 heures et 8 minutes
 # AUTHOR = "MachineLearnia"           #  65 videos - 22 heures et 53 minutes
 
-AUTHOR = "doro2255"                 #   1 seule vidéo (7') # Garde fou !
+# AUTHOR = "doro2255"                 #   1 seule vidéo (7') # Garde fou !
 
 if "AUTHOR" not in globals():
     sys.exit(f"{RED}AUTHOR n'est pas défini. Arrêt du script.{R}")
@@ -106,6 +114,7 @@ YDL_OPTS_DETAIL: YdlOpts = {
 MAX_CUMULATED_403_ERRORS = 7
 PAUSE_ON_RATE_LIMIT = 5  # secondes d'attente avant reprise automatique
 MAX_STALL_RETRIES = 3  # passes sans progression avant arrêt définitif
+TOTAL_PLAYLIST_DROP_GUARD_RATIO = 0.03  # 3%
 
 
 def is_counted_ytdlp_error(exc):
@@ -432,6 +441,7 @@ def scrap_some():
     _, total_playlist = (
         read_previous_counts()
     )  # récupère total connu pour la vérification de complétude
+    previous_total_playlist = total_playlist
     error_tracker = CountedErrorTracker(MAX_CUMULATED_403_ERRORS)
 
     if videos:
@@ -478,7 +488,28 @@ def scrap_some():
                 entries = playlist_infos.get("entries", [])
 
             total_videos = playlist_infos.get("playlist_count")
-            total_playlist = total_videos if isinstance(total_videos, int) else None
+            detected_total_playlist = (
+                total_videos if isinstance(total_videos, int) else None
+            )
+
+            if isinstance(detected_total_playlist, int):
+                total_playlist = detected_total_playlist
+                if (
+                    isinstance(previous_total_playlist, int)
+                    and previous_total_playlist > 0
+                    and detected_total_playlist < previous_total_playlist
+                ):
+                    drop_ratio = (
+                        previous_total_playlist - detected_total_playlist
+                    ) / previous_total_playlist
+                    if drop_ratio > TOTAL_PLAYLIST_DROP_GUARD_RATIO:
+                        print(
+                            f"{YELLOW}Protection total_playlist: nouveau total détecté {detected_total_playlist} inférieur de {drop_ratio * 100:.2f}% à l'ancien {previous_total_playlist}. Ancienne valeur conservée dans le JSON.{R}"
+                        )
+                        total_playlist = previous_total_playlist
+            else:
+                total_playlist = None
+
             total_videos_txt = (
                 str(total_videos)
                 if isinstance(total_videos, int)
