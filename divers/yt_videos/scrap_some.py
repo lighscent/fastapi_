@@ -35,6 +35,9 @@ if TYPE_CHECKING:
 # AUTHOR = "tseries"                  # 23 458 vidéos - ❌ - Compte qui génère le + de gains au Monde avec YT !
 
 
+# Niveau scolaire
+# AUTHOR = "coach-exam"²              #     110 videos -   194 918 vues - 12 heures et 54 minutes
+
 # Initiation à Python (Bases)
 # AUTHOR = "CodeAvecJonathan"         #     10 videos -  5 386 712 vues -  15 heures et 16 minutes
 # AUTHOR = "Gravenilvectuto"          #    174 videos - 26 844 155 vues -  49 heures et 39 minutes
