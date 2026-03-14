@@ -6,9 +6,8 @@ from typing import TYPE_CHECKING, TypedDict, cast
 import yt_dlp
 from yt_dlp.utils import DownloadError
 
-# ❌ Compatibilité de PyMoX-Kit avec Linux (Cf. GH spaces)
-from pymox_kit import *
-
+# ❌ Compatibilité de PyMoX-Kit & locazle avec Linux (Cf. GH spaces)
+locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 
 # try:
 #     from pymox_kit import cls, end
@@ -22,43 +21,41 @@ from pymox_kit import *
 #         except Exception:
 #             print("\033[2J\033[H", end="")
 
-# ❌ Loker ce qui n'a pas été refait ici et redonner le nom to_see à ce script
-
-# ❌ ⚠️ Cf si locale marche en linux
-locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
+from pymox_kit import *
+# ❌ Looker ce qui n'a pas été refait ici et redonner le nom to_see à ce script
 
 if TYPE_CHECKING:
     from yt_dlp.YoutubeDL import _Params
 
 # Pour mise au point du script
-# AUTHOR = "doro2255"                 #   1 seule vidéo (7')
-# AUTHOR = "LionelCOTE"               #  Pour mise au point car peu de vidéos (12 - 1H27)
-# AUTHOR = "c57-u5s"                  #  16 videos - 11 heures et 23 minutes
-# AUTHOR = "Alphorm"                  # Extrême  - 4064 videos - 665 heures et 3 minutes - Diverses notions liées à l'informatique
-AUTHOR = "tseries"                  # Top Extrême - 23 458 vidéos - ❌ - Compte qui génère le + de gains au Monde avec YT !
+# AUTHOR = "doro2255"                 #      1 video  -         28 vues - 7 minutes
+# AUTHOR = "LionelCOTE"               #     12 videos -      3 952 vues - 1 heure et 27 minutes - Aide pour mise au point car peu de vidéos
+# AUTHOR = "c57-u5s"                  #     16 videos -      1 097 vues - 11 heures et 23 minutes
+# AUTHOR = "Alphorm"                  #   4064 videos - 15 577 306 vues - 665 heures et 3 minutes - Au passage, diverses notions liées à l'informatique
+# AUTHOR = "tseries"                  # 23 458 vidéos - ❌ - Compte qui génère le + de gains au Monde avec YT !
+
 
 # Initiation à Python (Bases)
-# AUTHOR = "CodeAvecJonathan"         #  10 videos -  15 heures et 16 minutes
-# AUTHOR = "Gravenilvectuto"          # 174 videos -  49 heures et 39 minutes
-# AUTHOR = "hassanbahi"               # 843 vidéos - 191 heures et 13 minutes - Top pour comprendre super bien les bases - Attention: Pas mal de vidéos + anciennes avec le langage C, mais facielement adaptable... D'ailleurs, c 1 super exo ;-) !
+# AUTHOR = "CodeAvecJonathan"         #     10 videos -  5 386 712 vues -  15 heures et 16 minutes
+# AUTHOR = "Gravenilvectuto"          #    174 videos - 26 844 155 vues -  49 heures et 39 minutes
+# AUTHOR = "hassanbahi"               #    843 videos - 52 877 137 vues - 191 heures et 13 minutes - Top pour comprendre super bien les bases - Attention: Pas mal de vidéos + anciennes avec le langage C, mais facilement adaptable ou catégoriser 'done' ;-) !... Sinon, c aussi 1 super exo ;-) !
 
 # Python approfondi
-# AUTHOR = "donaldprogrammeur"        # Des bases à DevOps (424 vidéos - 303 heures et 56 minutes)
+# AUTHOR = "donaldprogrammeur"        #    424 videos -  1 143 154 vues - 303 heures et 56 minutes - Des bases à DevOps
 
 
 # Python - FastAPI
+# AUTHOR = "DataAvecJB"               #     16 videos -     49 885 vues -  8 heures et  6 minutes - FastAPI en moins de 10 minutes
+# AUTHOR = "bandedecodeurs"           #     50 videos -    740 735 vues - 21 heures et 16 minutes - + généraliste, intro simple et visuelle
+# AUTHOR = "MasteringAI-q9g"          #     29 videos -      3 701 vues - 10 heures et 41 minutes - Exemple pédagogique orienté objet et plus complet (DB, validation, endpoints)
 
-# AUTHOR = "DataAvecJB"               # Les bases
-AUTHOR = "bandedecodeurs"           # Les bases
-AUTHOR = "MasteringAI-q9g"          # Les bases
+# AUTHOR = "CodeGoat-s2y"             #     38 videos -     41 614 vues - 24 heures et 23 minutes - En anglais, mais archi complet
 
 
 # Python pour l'IA
-# AUTHOR = "KevinDegila"              # 262 videos - 53 heures et 38 minutes
-# AUTHOR = "InformatiqueSansComplexe" # 284 videos - 33 heures et 8 minutes
-# AUTHOR = "MachineLearnia"           #  65 videos - 22 heures et 53 minutes
-
-# AUTHOR = "doro2255"                 #   1 seule vidéo (7') # Garde fou !
+# AUTHOR = "KevinDegila"              #
+# AUTHOR = "InformatiqueSansComplexe" #    284 videos -  1 809 388 vues - 33 heures et  8 minutes
+# AUTHOR = "MachineLearnia"           #     65 videos - 11 493 021 vues - 22 heures et 53 minutes
 
 if "AUTHOR" not in globals():
     sys.exit(f"{RED}AUTHOR n'est pas défini. Arrêt du script.{R}")
@@ -70,9 +67,7 @@ STORAGE_DIR = os.path.join(SCRIPT_DIR, "cache")
 # OUTPUT_FILE = os.path.join(
 #     STORAGE_DIR, f".{AUTHOR}_videos.json"
 # )  # ❌ Simplify file name author_videos.json
-OUTPUT_FILE = os.path.join(
-    STORAGE_DIR, f".{AUTHOR}_videos_scrap_some.json"
-)  # 2ar
+OUTPUT_FILE = os.path.join(STORAGE_DIR, f".{AUTHOR}_videos_scrap_some.json")  # 2ar
 OUTPUT_MD_FILE = os.path.join(STORAGE_DIR, f"{AUTHOR}.md")
 CACHE_TTL = 3600  # 3600 = 1 heure - 86400 = 1 jour
 
@@ -300,7 +295,9 @@ def write_markdown(videos, total_playlist=None):
     total_duration_seconds = sum(
         int(v.get("duration") or 0) for v in videos if isinstance(v, dict)
     )
+    total_views = sum(int(v.get("vues") or 0) for v in videos if isinstance(v, dict))
     total_duration_txt = format_remaining_time_fr(total_duration_seconds // 60)
+    total_views_txt = f"{total_views:,}".replace(",", " ")
     nb_videos_txt = f"**{len(videos)}** video{'s' if len(videos) > 1 else ''}"
 
     md = "# BP Learning - Vidéos à voir\n\n"
@@ -310,7 +307,7 @@ def write_markdown(videos, total_playlist=None):
         partiel_txt1 = f" ⚠️ PARTIEL → "
         partiel_txt2 = f"/ **{total_playlist}** "
 
-    md += f"## Auteur **[{AUTHOR}]({URL})** ({partiel_txt1} {nb_videos_txt} {partiel_txt2}- {total_duration_txt} )\n\n"
+    md += f"## Auteur **[{AUTHOR}]({URL})** ({partiel_txt1} {nb_videos_txt} {partiel_txt2}- {total_views_txt} vues - {total_duration_txt} )\n\n"
 
     for video in videos:
         if not isinstance(video, dict):
@@ -560,7 +557,7 @@ def scrap_some():
                         continue
 
                     print(
-                        f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécutées : {SB}{run_processed} ( {(run_processed) / len(missing_in_cache) * 100:.1f} % ) {R}{error_tracker.progress_suffix()}"
+                        f"{CYAN}[progress] Vidéo globale {SB}{idx} / {total_entries} - {round(100*idx/total_entries,1)} %{R} {CYAN}| Exécutées : {SB}{run_processed} ( {(run_processed) / len(missing_in_cache) * 100:.1f} % ) {R}{error_tracker.progress_suffix()} | {SB}{AUTHOR}{R}"
                     )
 
                     try:
