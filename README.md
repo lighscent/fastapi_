@@ -2,7 +2,7 @@
 
 [![Website](https://img.shields.io/badge/cote7.com-6366F1?style=for-the-badge&logo=safari)](https://cote7.com) [![Instagram](https://img.shields.io/badge/Instagram-GC7-E4405F?style=for-the-badge&logo=instagram)](https://www.instagram.com/grcote7) [![GitHub followers](https://img.shields.io/github/followers/grcote7?style=for-the-badge&logo=github&color=6366F1)](https://github.com/grcote7?tab=followers)
 
-[![Python >= 3.6.2](https://img.shields.io/badge/python-%3E%3D3.62-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
+[![Python >= 3.6.2](https://img.shields.io/badge/python-%3E%3D3.6.2-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
 
 ```mermaid
 graph TD
