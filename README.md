@@ -2,6 +2,8 @@
 
 [![Website](https://img.shields.io/badge/cote7.com-6366F1?style=for-the-badge&logo=safari)](https://cote7.com) [![Instagram](https://img.shields.io/badge/Instagram-GC7-E4405F?style=for-the-badge&logo=instagram)](https://www.instagram.com/grcote7) [![GitHub followers](https://img.shields.io/github/followers/grcote7?style=for-the-badge&logo=github&color=6366F1)](https://github.com/grcote7?tab=followers)
 
+[![Python >= 3.6.2](https://img.shields.io/badge/python-%3E%3D3.62-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
+
 ```mermaid
 graph TD
     root --> app
@@ -10,11 +12,9 @@ graph TD
     app --> templates
 ```
 
-# API Project (FastAPI, Numpy, ML, etc.)
+# FastAPI
 
 Ce projet vise à explorer le développement d'architectures backend modernes avec **FastAPI**, **Python** (et éventuellement **Mojo** pour les performances de calcul intensif). 
-
-Afin de garder ce dépôt clair, la documentation a été séparée en plusieurs fichiers que vous pouvez consulter dans le dossier `docs/` :
 
 ## 📚 Documentation et Ressources
 
@@ -29,7 +29,7 @@ Afin de garder ce dépôt clair, la documentation a été séparée en plusieurs
 ## 🛠️ Installation et Déploiement
 
 ### 1️⃣ Forker le projet
-Fork [https://github.com/gricatan/PROJECT](https://github.com/gricatan/PROJECT) → Dans GH, avec *TON_USER_COMPTE*
+Fork [https://github.com/GrCOTE7/fastapi/fork](https://github.com/GrCOTE7/fastapi/fork) → Dans GH, avec *TON_USER_COMPTE*
 
 ### 2️⃣ Cloner en local
 En CLI, dans le dossier de votre choix :
@@ -39,7 +39,7 @@ cd PROJECT
 ```
 
 ### 3️⃣ Mettre en place l'environnement virtuel (.venv)
-> **Note** : Utiliser Python 3.12 max.
+> **Note** : Utiliser Python 3.6.2 minimum (et 3.12 max).
 > Exemple pour Windows : [Télécharger Python 3.12.10 (zip)](https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.zip) et décompresser dans `C:\python312\`
 
 ```bash
