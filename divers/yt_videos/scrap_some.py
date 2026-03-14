@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 # AUTHOR = "LionelCOTE"               #  Pour mise au point car peu de vidéos (12 - 1H27)
 # AUTHOR = "c57-u5s"                  #  16 videos - 11 heures et 23 minutes
 # AUTHOR = "Alphorm"                  # Extrême  - 4064 videos - 665 heures et 3 minutes - Diverses notions liées à l'informatique
-# AUTHOR = "tseries"                  # Top Extrême - 23 458 vidéos - ❌ - Compte qui génère le + de gains au Monde avec YT !
+AUTHOR = "tseries"                  # Top Extrême - 23 458 vidéos - ❌ - Compte qui génère le + de gains au Monde avec YT !
 
 # Initiation à Python (Bases)
 # AUTHOR = "CodeAvecJonathan"         #  10 videos -  15 heures et 16 minutes
@@ -50,7 +50,7 @@ if TYPE_CHECKING:
 # AUTHOR = "InformatiqueSansComplexe" # 284 videos - 33 heures et 8 minutes
 # AUTHOR = "MachineLearnia"           #  65 videos - 22 heures et 53 minutes
 
-# AUTHOR = "doro2255"                 #   1 seule vidéo (7') # Garde fou !
+AUTHOR = "doro2255"                 #   1 seule vidéo (7') # Garde fou !
 
 if "AUTHOR" not in globals():
     sys.exit(f"{RED}AUTHOR n'est pas défini. Arrêt du script.{R}")
@@ -59,9 +59,12 @@ if "AUTHOR" not in globals():
 URL = f"https://www.youtube.com/@{AUTHOR}/videos"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 STORAGE_DIR = os.path.join(SCRIPT_DIR, "cache")
+# OUTPUT_FILE = os.path.join(
+#     STORAGE_DIR, f".{AUTHOR}_videos.json"
+# )  # ❌ Simplify file name author_videos.json
 OUTPUT_FILE = os.path.join(
-    STORAGE_DIR, f".{AUTHOR}_videos.json"
-)  # ❌ Simplify file name author_videos.json
+    STORAGE_DIR, f".{AUTHOR}_videos_scrap_some.json"
+)  # 2ar
 OUTPUT_MD_FILE = os.path.join(STORAGE_DIR, f"{AUTHOR}.md")
 CACHE_TTL = 3600  # 3600 = 1 heure - 86400 = 1 jour
 
@@ -385,7 +388,7 @@ def get_simulated_failure_position(existing_scraped):
 
 
 def scrap_some():
-    print(f"SCRAP des vidéos de {AUTHOR}\n{URL}")
+    print(f"SCRAP des vidéos de {SB}{AUTHOR}{R}\n{URL}")
 
     cache_entry = get_valid_cache_entry(OUTPUT_FILE, CACHE_TTL)
     if cache_entry is not None:
@@ -481,7 +484,7 @@ def scrap_some():
                 if isinstance(total_videos, int)
                 else f"Nombre inconnu (au moins {len(entries)}) de"
             )
-            print(f"{RED}{total_videos_txt} vidéos{R} trouvées dans la playlist.")
+            print(f"{RED}{total_videos_txt} vidéo(s){R} trouvée(s) dans la playlist.")
             total_entries = len(entries)
             run_processed = 0
             playlist_ids = [
@@ -617,6 +620,7 @@ def scrap_some():
     print(
         f"Erreurs cumulées (403/rate-limit) total toutes passes: {error_tracker.total_count}"
     )
+    print(f"Fin du scrap des vidéos de {SB}{AUTHOR}{R}.")
 
 
 if __name__ == "__main__":
